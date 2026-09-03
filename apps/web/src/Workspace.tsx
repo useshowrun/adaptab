@@ -1,6 +1,6 @@
 import { getUser, handleAuthCallback, login, logout, oauthLogin, signup, type User } from "@netlify/identity";
 import { useEffect, useMemo, useState, type FormEvent } from "react";
-import { postJson } from "./api";
+import { authenticatedFetch, postJson } from "./api";
 import { encryptPrivateSource, hasPrivateToolKey, savePrivateToolKey } from "./private-crypto";
 import { registerPrivateBootstrapTools, registerPrivateWorkspaceTools } from "./register-private-tools";
 
@@ -95,7 +95,7 @@ export default function Workspace() {
         const result = await postJson<{ tool: PrivateTool }>("/api/private-tool", { toolId }); setSelected(result.tool);
         registerPrivateBootstrapTools(toolId).then(setWebmcp).catch(() => setWebmcp("error"));
       } else {
-        const response = await fetch("/api/private-tools", { credentials: "same-origin", cache: "no-store" });
+        const response = await authenticatedFetch("/api/private-tools", { cache: "no-store" });
         if (!response.ok) throw new Error("Private workspace is unavailable.");
         const body = await response.json(); setTools(Array.isArray(body.tools) ? body.tools : []);
         registerPrivateWorkspaceTools().then(setWebmcp).catch(() => setWebmcp("error"));

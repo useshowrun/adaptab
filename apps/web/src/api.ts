@@ -1,9 +1,16 @@
+import { getUser, refreshSession } from "@netlify/identity";
+
+export async function authenticatedFetch(input: RequestInfo | URL, init: RequestInit = {}) {
+  const user = await getUser();
+  if (user) await refreshSession();
+  return fetch(input, { ...init, credentials: "same-origin" });
+}
+
 export async function postJson<T>(path: string, input: unknown): Promise<T> {
-  const response = await fetch(path, {
+  const response = await authenticatedFetch(path, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(input),
-    credentials: "same-origin",
   });
 
   const body = await response.json().catch(() => ({

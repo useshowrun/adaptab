@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { authenticatedFetch } from "./api";
 import { registerBootstrapTools } from "./register-bootstrap";
 import Workspace from "./Workspace";
 
@@ -32,9 +33,8 @@ function PublicCatalog() {
       })
       .then((body) => setAdapters(Array.isArray(body.adapters) ? body.adapters : []))
       .catch(() => setAdapters([]));
-    fetch("/api/private-tools", {
+    authenticatedFetch("/api/private-tools", {
       cache: "no-store",
-      credentials: "same-origin",
       headers: { accept: "application/json" },
     })
       .then(async (response) => {

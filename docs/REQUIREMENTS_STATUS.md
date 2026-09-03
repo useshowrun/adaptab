@@ -28,7 +28,7 @@ adds evidence.
   native target-page tool discovery, and live invocation.
 - Six reviewed adapters are implemented across Raising.fi, GitHub, Hacker
   News, and three LinkedIn product groups.
-- Fifty-eight automated tests and repeated integrated-browser tests pass.
+- Sixty automated tests and repeated integrated-browser tests pass.
 - Of the eight original product requirement groups: one is MVP complete and
   seven are partial; the private-workspace requirement now has a tested narrow
   implementation rather than only a design.
