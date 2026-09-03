@@ -31,8 +31,9 @@ Last updated: 2026-09-03
   namespaced by deployment context.
 - Private-workspace code with Netlify Identity, owner-scoped Blobs storage,
   fixed-recipient declarative LinkedIn tools, and authenticated activation
-  pages. Production Identity enablement and browser verification remain.
-- Forty-two automated tests plus production build validation.
+  pages. Identity and the default GitHub provider are enabled in production;
+  an authenticated stored-record/browser test remains.
+- Forty-three automated tests plus production build validation.
 
 ## Verified in ChatGPT's integrated browser
 
@@ -82,7 +83,7 @@ approved page-injection capability such as full CDP access.
 ## Next
 
 1. Record the sub-three-minute demo and complete the Devpost submission.
-2. Enable Netlify Identity and verify private creation, owner isolation,
-   private bootstrap discovery, and bundle injection in production.
+2. Verify private creation, owner isolation, private bootstrap discovery, and
+   bundle injection in production.
 3. Add a guided adapter-authoring workflow using the existing manifests as
    examples and Showrun only as prior-art reference material.

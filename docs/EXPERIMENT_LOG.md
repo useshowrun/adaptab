@@ -138,8 +138,9 @@ The first private adapter slice is implemented and covered by automated tests:
 - the public catalog filters on `visibility: public` explicitly; and
 - the agent-facing page registers only private info and bundle bootstrap tools.
 
-The production Identity configuration, stored-record round trip, and injected
-private bundle remain to be verified in a real browser.
+Production Identity and the default GitHub provider are enabled. The
+authenticated stored-record round trip and injected private bundle remain to
+be verified in a real browser.
 
 ## GitHub public adapter test
 

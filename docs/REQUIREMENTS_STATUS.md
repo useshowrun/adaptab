@@ -28,7 +28,7 @@ adds evidence.
   native target-page tool discovery, and live invocation.
 - Six reviewed adapters are implemented across Raising.fi, GitHub, Hacker
   News, and three LinkedIn product groups.
-- Forty-two automated tests and repeated integrated-browser tests pass.
+- Forty-three automated tests and repeated integrated-browser tests pass.
 - Of the eight original product requirement groups: one is MVP complete and
   seven are partial; the private-workspace requirement now has a tested narrow
   implementation rather than only a design.
@@ -193,8 +193,8 @@ Shipped:
 
 Missing:
 
-- Production Identity enablement and a real-browser stored-record/injection
-  test.
+- A real-browser authenticated stored-record/injection test. Production
+  Identity and its default GitHub provider are enabled.
 - General local adapter import, permission preview, and additional templates.
 - Encryption/key management, deletion/export/revocation, quotas, and audit
   controls.
@@ -260,7 +260,8 @@ Shipped:
 
 Missing:
 
-- Production Identity enablement and isolation verification.
+- Production authenticated record creation and cross-owner isolation
+  verification. Identity and its default GitHub provider are enabled.
 - Organizations, membership, roles, invitations, encrypted private artifacts,
   audit logs, secret handling, sharing controls, revocation, and formal tenant
   isolation review.

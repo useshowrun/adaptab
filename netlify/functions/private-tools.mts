@@ -35,6 +35,10 @@ export function createPrivateToolsHandler(dependencies: Dependencies) {
       dependencies.verifyOrigin(request);
       const body = await parseJsonBody(request, 4096);
       assertKeys(body, ["label", "recipientProfileUrls"]);
+      const existing = await dependencies.repository.list(user.id);
+      if (existing.length >= 20) {
+        throw new HttpError(409, "private_tool_limit", "This MVP workspace is limited to 20 private tools.");
+      }
       let record;
       try {
         record = createPrivateToolRecord(user.id, {

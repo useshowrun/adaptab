@@ -84,6 +84,16 @@ describe("private tool authorization", () => {
     expect(response.status).toBe(404);
   });
 
+  it("bounds each MVP workspace to twenty tools", async () => {
+    const repository = new MemoryRepository();
+    for (let index = 0; index < 20; index += 1) {
+      await repository.put(createPrivateToolRecord("owner-a", { label: `Private group ${index}`, recipientProfileUrls: ["https://www.linkedin.com/in/example"] }));
+    }
+    const handler = createPrivateToolsHandler({ currentUser: async () => ({ id: "owner-a" }), repository, verifyOrigin: () => {} });
+    const response = await handler(post({ label: "One too many", recipientProfileUrls: ["https://www.linkedin.com/in/example"] }));
+    expect(response.status).toBe(409);
+  });
+
   it("delivers an owner-only bundle with private no-store caching", async () => {
     const repository = new MemoryRepository();
     const record = createPrivateToolRecord("owner-a", { label: "Private group", recipientProfileUrls: ["https://www.linkedin.com/in/example"] });

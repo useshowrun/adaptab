@@ -47,3 +47,7 @@ The public catalog works without Identity. To activate `/workspace`:
 The opaque URL is a locator, not a bearer token. Private Functions always read
 the Identity session and scope the Netlify Blobs key to that owner. Do not place
 access tokens in query strings.
+
+The current hackathon deployment uses open registration with required email
+confirmation and Netlify's default GitHub provider. Each owner is capped at 20
+private tools in the MVP; use invite-only registration for a closed deployment.
