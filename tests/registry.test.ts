@@ -27,6 +27,24 @@ describe("adapter resolution", () => {
       reason: "intent_not_supported",
     });
   });
+
+  it("selects only LinkedIn core search on supported routes and intent", () => {
+    const result = resolveAdapter({
+      url: "https://www.linkedin.com/mynetwork/catch-up/all/",
+      intent: "search for the OpenAI company",
+      client: "chatgpt-integrated-browser",
+    });
+    expect(result.matched).toBe(true);
+    if (result.matched) {
+      expect(result.match.adapterId).toBe("linkedin.core.company-search");
+      expect(result.tools.map((tool) => tool.name)).toEqual(["adaptab_linkedin_search_companies"]);
+    }
+    expect(resolveAdapter({
+      url: "https://www.linkedin.com/jobs/",
+      intent: "search companies",
+      client: "cdp",
+    })).toMatchObject({ matched: false, reason: "site_or_route_not_supported" });
+  });
 });
 
 describe("immutable bundle", () => {

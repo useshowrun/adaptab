@@ -12,6 +12,8 @@ Last updated: 2026-09-03
 - `raising-fi.public.funding@1.0.0` with exact-origin enforcement, top-level
   enforcement, idempotent installation, bounded inputs/outputs, timeout, and a
   single same-origin network route.
+- `linkedin.core.company-search@1.0.0` with route-aware selection, live-session
+  CSRF derivation inside the page, bounded results, and no credential export.
 - Netlify Functions for catalog, resolution, bundle delivery, adapter requests,
   and opt-in telemetry.
 - Netlify Blobs append-only storage for sanitized requests and telemetry,
@@ -35,12 +37,17 @@ The following real flow passed:
 The complete flow was repeated successfully against the public Netlify
 deployment and a clean Raising.fi document.
 
+The LinkedIn company-search adapter was also resolved from the local AdapTab
+catalog, installed into an authenticated LinkedIn document, and invoked through
+native WebMCP. A query for OpenAI returned three bounded company results while
+credentials remained inside the page.
+
 This verifies the no-extension MVP path. It still requires a client with an
 approved page-injection capability such as full CDP access.
 
 ## Next
 
-1. Add the LinkedIn core company-search adapter.
+1. Deploy and repeat the LinkedIn company-search test from the public catalog.
 2. Add the narrowly confirmed LinkedIn messaging adapter with prepare/commit
    semantics and no ambiguous retries.
 3. Polish public documentation and record the sub-three-minute demo.

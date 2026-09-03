@@ -1,10 +1,13 @@
 import { createHash } from "node:crypto";
 import { raisingFiBundleSource } from "../../../adapters/raising-fi/bundle";
 import { raisingFiManifest } from "../../../adapters/raising-fi/manifest";
+import { linkedinCoreBundleSource } from "../../../adapters/linkedin/core/bundle";
+import { linkedinCoreManifest } from "../../../adapters/linkedin/core/manifest";
 import type { BundleRecord, ClientKind, ResolveInput } from "../../adapter-sdk/src/types";
 
 const bundles: BundleRecord[] = [
   { manifest: raisingFiManifest, source: raisingFiBundleSource },
+  { manifest: linkedinCoreManifest, source: linkedinCoreBundleSource },
 ];
 
 function normalizePathPattern(pattern: string): RegExp {

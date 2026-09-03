@@ -21,10 +21,19 @@ h1 em { color: #6a00ff; font-style: normal; }
 .flow article { padding: 36px 4vw 42px 0; min-height: 230px; }
 .flow article + article { border-left: 1px solid #18211b; padding-left: 4vw; }
 .flow b, code { font: 500 11px DM Mono, monospace; color: #6a00ff; }
-.flow h2, .catalog h2 { margin: 36px 0 10px; font-size: 28px; letter-spacing: -.04em; }
-.flow p, .catalog p { color: #59635b; line-height: 1.55; }
-.catalog { display: grid; grid-template-columns: 1fr 1fr auto; gap: 40px; align-items: end; padding: 60px 0; }
-.catalog h2 { margin: 9px 0 0; font-size: 48px; }
-.catalog code { color: #18211b; background: #d7ff4f; padding: 12px; }
+.flow h2 { margin: 36px 0 10px; font-size: 28px; letter-spacing: -.04em; }
+.flow p, .catalog-section p { color: #59635b; line-height: 1.55; }
+.catalog-section { padding: 72px 0; }
+.catalog-heading { display: flex; align-items: end; justify-content: space-between; gap: 30px; margin-bottom: 34px; }
+.catalog-heading h2 { margin: 10px 0 0; font-size: clamp(38px, 6vw, 72px); line-height: .95; letter-spacing: -.06em; }
+.catalog-heading > p { font: 500 11px DM Mono, monospace; text-transform: uppercase; }
+.adapter-list { border-top: 1px solid #18211b; }
+.adapter-list article { display: grid; grid-template-columns: 50px 1fr auto auto; gap: 28px; align-items: center; min-height: 110px; border-bottom: 1px solid #18211b55; }
+.adapter-list b, .adapter-list span { font: 500 10px DM Mono, monospace; letter-spacing: .08em; }
+.adapter-list span { color: #6a00ff; border: 1px solid #6a00ff66; padding: 7px 9px; }
+.adapter-list h3 { margin: 0 0 5px; font-size: 21px; letter-spacing: -.03em; }
+.adapter-list p { margin: 0; font: 400 10px DM Mono, monospace; }
+.adapter-list code { color: #18211b; background: #d7ff4f; padding: 10px; }
+.catalog-loading { padding: 34px 0; }
 footer { padding: 22px 0 32px; border-top: 1px solid #18211b33; display: flex; justify-content: space-between; font: 400 10px DM Mono, monospace; text-transform: uppercase; }
-@media (max-width: 720px) { .flow, .catalog { grid-template-columns: 1fr; } .flow article + article { border-left: 0; border-top: 1px solid #18211b; padding-left: 0; } .catalog { align-items: start; gap: 12px; } nav > a:last-child { display: none; } }
+@media (max-width: 720px) { .flow { grid-template-columns: 1fr; } .flow article + article { border-left: 0; border-top: 1px solid #18211b; padding-left: 0; } .catalog-heading { align-items: start; flex-direction: column; } .adapter-list article { grid-template-columns: 34px 1fr; padding: 24px 0; } .adapter-list span, .adapter-list code { grid-column: 2; justify-self: start; } nav > a:last-child { display: none; } }

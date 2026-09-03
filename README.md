@@ -35,17 +35,20 @@ Target document
 
 ## Current demo
 
-The MVP ships `raising-fi.public.funding@1.0.0`, a bounded read-only adapter for
-the public Raising.fi funding preview. From a clean Raising.fi tab, the tested
-flow is:
+The MVP ships two bounded read-only adapters:
+
+- `raising-fi.public.funding@1.0.0` for the public Raising.fi funding preview.
+- `linkedin.core.company-search@1.0.0` for authenticated LinkedIn company
+  search using the current page session.
+
+From a clean target tab, the tested flow is:
 
 1. Call `adaptab_resolve` on the AdapTab start page.
 2. Call `adaptab_get_bundle` for the exact returned version.
 3. Verify its SHA-256 and expected origin.
 4. Evaluate the installer in the Raising.fi top-level document using approved
    CDP access.
-5. Rediscover and call `adaptab_raising_fi_list_recent_funding` through native
-   WebMCP.
+5. Rediscover and call the resolved target tool through native WebMCP.
 
 ## Local development
 
