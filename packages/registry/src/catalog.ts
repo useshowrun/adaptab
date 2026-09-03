@@ -3,11 +3,14 @@ import { raisingFiBundleSource } from "../../../adapters/raising-fi/bundle";
 import { raisingFiManifest } from "../../../adapters/raising-fi/manifest";
 import { linkedinCoreBundleSource } from "../../../adapters/linkedin/core/bundle";
 import { linkedinCoreManifest } from "../../../adapters/linkedin/core/manifest";
+import { linkedinMessagingBundleSource } from "../../../adapters/linkedin/messaging/bundle";
+import { linkedinMessagingManifest } from "../../../adapters/linkedin/messaging/manifest";
 import type { BundleRecord, ClientKind, ResolveInput } from "../../adapter-sdk/src/types";
 
 const bundles: BundleRecord[] = [
   { manifest: raisingFiManifest, source: raisingFiBundleSource },
   { manifest: linkedinCoreManifest, source: linkedinCoreBundleSource },
+  { manifest: linkedinMessagingManifest, source: linkedinMessagingBundleSource },
 ];
 
 function normalizePathPattern(pattern: string): RegExp {

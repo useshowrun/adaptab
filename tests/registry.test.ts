@@ -45,6 +45,23 @@ describe("adapter resolution", () => {
       client: "cdp",
     })).toMatchObject({ matched: false, reason: "site_or_route_not_supported" });
   });
+
+  it("selects only the LinkedIn messaging group for a send intent", () => {
+    const result = resolveAdapter({
+      url: "https://www.linkedin.com/in/example/",
+      intent: "send a message to this profile",
+      client: "chatgpt-integrated-browser",
+    });
+    expect(result.matched).toBe(true);
+    if (result.matched) {
+      expect(result.match.adapterId).toBe("linkedin.messaging.send-message");
+      expect(result.tools.map((tool) => tool.name)).toEqual([
+        "adaptab_linkedin_prepare_message",
+        "adaptab_linkedin_send_prepared_message",
+      ]);
+      expect(result.tools[1]).toMatchObject({ readOnly: false, requiresConfirmation: true });
+    }
+  });
 });
 
 describe("immutable bundle", () => {

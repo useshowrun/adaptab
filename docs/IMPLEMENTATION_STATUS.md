@@ -14,11 +14,13 @@ Last updated: 2026-09-03
   single same-origin network route.
 - `linkedin.core.company-search@1.0.0` with route-aware selection, live-session
   CSRF derivation inside the page, bounded results, and no credential export.
+- `linkedin.messaging.send-message@1.0.0` with exact profile verification,
+  short-lived prepare/confirm drafts, and pre-request at-most-once locking.
 - Netlify Functions for catalog, resolution, bundle delivery, adapter requests,
   and opt-in telemetry.
 - Netlify Blobs append-only storage for sanitized requests and telemetry,
   namespaced by deployment context.
-- Fifteen automated tests plus production build validation.
+- Twenty automated tests plus production build validation.
 
 ## Verified in ChatGPT's integrated browser
 
@@ -42,11 +44,17 @@ AdapTab catalogs, installed into authenticated LinkedIn documents, and invoked
 through native WebMCP. Queries for OpenAI and Showrun returned bounded company
 results while credentials remained inside the page.
 
+The messaging group was resolved and registered in the authenticated LinkedIn
+document, exposing separate prepare and send tools. Its send, duplicate-send,
+ambiguous-outcome, expiry boundary, origin guard, and recipient-validation
+behavior are covered by mocks. No real message was sent during this
+implementation pass.
+
 This verifies the no-extension MVP path. It still requires a client with an
 approved page-injection capability such as full CDP access.
 
 ## Next
 
-1. Add the narrowly confirmed LinkedIn messaging adapter with prepare/commit
-   semantics and no ambiguous retries.
+1. Deploy and verify the messaging group from the public catalog without
+   invoking a real send.
 2. Polish public documentation and record the sub-three-minute demo.
