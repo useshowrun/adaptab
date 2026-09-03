@@ -87,6 +87,10 @@ top-level document. LinkedIn discovered the generated preview and confirmed-
 send tools through native WebMCP. Neither tool was invoked, so this test made
 no profile-resolution requests and sent no messages.
 
+A subsequent owner-authorized production run exercised the complete reviewed-
+template flow. After a separate action-time confirmation, the send tool
+reported successful bounded delivery with retries disabled for the batch.
+
 ## Next
 
 1. Record the sub-three-minute demo and complete the Devpost submission.

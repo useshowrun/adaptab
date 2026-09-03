@@ -153,6 +153,12 @@ test intentionally invoked neither, so it made no recipient-resolution
 requests and sent no messages. Cross-owner 404 behavior is unit-tested but
 still needs a second production identity for live verification.
 
+A later owner-authorized production test completed the full reviewed-template
+path: authenticated bundle retrieval, SHA-256 verification, tab-scoped CDP
+injection, native WebMCP discovery, read-only preview, and a separately
+confirmed mutation. The tool reported successful bounded delivery and disabled
+retries for the completed batch.
+
 The next private-library slice adds a general custom import path. Automated
 tests verify manifest bounds, confirmation requirements for mutations,
 client-side AES-GCM round trips, missing-key failure, ciphertext-only server

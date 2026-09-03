@@ -196,6 +196,9 @@ Shipped:
   owners, and uses `private, no-store` delivery.
 - Private adapters are explicitly excluded from public resolve, bundle, and
   catalog paths.
+- The reviewed private template is production-verified end to end: owner-only
+  bundle retrieval, hash verification, CDP injection, WebMCP discovery,
+  explicit confirmation, and bounded at-most-once delivery.
 
 Missing:
 
