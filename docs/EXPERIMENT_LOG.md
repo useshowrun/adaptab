@@ -186,8 +186,8 @@ signed-out requests unchanged.
 
 The corrected flow verified:
 
-- `/start` displayed three connected private WebMCP tools while keeping exactly
-  four bootstrap tool names;
+- `/start` connected two private adapter packages containing three WebMCP
+  actions while keeping exactly four bootstrap tool names;
 - authenticated resolution returned one intent-selected private LinkedIn
   adapter plus relevant route-matched public alternatives, without returning
   fixed-recipient configuration;

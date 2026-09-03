@@ -131,24 +131,24 @@ export default function Workspace() {
 
   if (user === undefined) return <main className="workspace"><p className="workspace-loading">Checking your AdapTab session…</p></main>;
   if (!user) return <main className="workspace"><nav><a className="wordmark" href="/start">AdapTab</a><a href="/start">Public catalog</a></nav><AuthPanel onAuthenticated={loadWorkspace} /></main>;
-  const toolCount = tools.reduce((count, adapter) => count + adapter.tools.length, 0);
+  const actionCount = tools.reduce((count, adapter) => count + adapter.tools.length, 0);
 
   return <main className="workspace">
     <nav><a className="wordmark" href="/start">AdapTab</a><div className="nav-actions"><a href="/workspace">Workspace</a><button onClick={async () => { await logout(); location.href = "/workspace"; }}>Sign out</button></div></nav>
-    <header className="workspace-header"><div><p className="eyebrow">PRIVATE WORKSPACE</p><h1>{toolId ? "Private adapter." : "Your WebMCP tools."}</h1></div><p>{user.email || user.name || "Authenticated owner"}</p></header>
+    <header className="workspace-header"><div><p className="eyebrow">PRIVATE WORKSPACE</p><h1>{toolId ? "Private adapter." : "Your private adapters."}</h1></div><p>{user.email || user.name || "Authenticated owner"}</p></header>
     {toolId ? <section className="workspace-card adapter-detail">
       {selected ? <>
         <div className="adapter-meta"><span className="private-badge">OWNER ONLY</span><span>{selected.encryption === "client-aes-gcm" ? "CLIENT ENCRYPTED" : "REVIEWED TEMPLATE"}</span></div>
         <h2>{selected.label}</h2><p>{selected.origins.join(" · ")} · v{selected.version}</p>
         <div className={`status status-${webmcp}`}><span />Activation tools: {webmcp.replaceAll("_", " ")}</div>
-        <h3>{selected.tools.length} WebMCP {selected.tools.length === 1 ? "tool" : "tools"}</h3><ToolRows tools={selected.tools} />
+        <h3>{selected.tools.length} WebMCP {selected.tools.length === 1 ? "action" : "actions"}</h3><ToolRows tools={selected.tools} />
         {selected.recipientProfileUrls && <><h3>Fixed LinkedIn recipients</h3><ul>{selected.recipientProfileUrls.map((url) => <li key={url}><a href={url}>{url}</a></li>)}</ul></>}
         {selected.kind === "encrypted-custom" && <div className="notice"><b>Device key:</b> {hasPrivateToolKey(selected.id) ? "available in this browser" : "missing in this browser"}. AdapTab cannot decrypt this source on the server.</div>}
         <div className="notice"><b>Lifecycle:</b> the trusted browser bridge evaluates the bundle only on an expected top-level origin. Full navigation or a new tab requires reinjection.</div>
       </> : <p>Loading private adapter…</p>}{message && <p className="form-error">{message}</p>}
     </section> : <>
       <section className="workspace-card library-card">
-        <div className="library-heading"><div><p className="eyebrow">TOOL LIBRARY</p><h2>{toolCount} private WebMCP {toolCount === 1 ? "tool" : "tools"}</h2></div><span>{tools.length} adapter {tools.length === 1 ? "package" : "packages"}</span></div>
+        <div className="library-heading"><div><p className="eyebrow">ADAPTER LIBRARY</p><h2>{tools.length} private {tools.length === 1 ? "adapter" : "adapters"}</h2></div><span>{actionCount} WebMCP {actionCount === 1 ? "action" : "actions"}</span></div>
         <div className={`status status-${webmcp}`}><span />Workspace discovery: {webmcp.replaceAll("_", " ")}</div>
         <div className="adapter-packages">{tools.length ? tools.map((adapter) => <a className="adapter-package" key={adapter.id} href={adapter.toolUrl}>
           <div className="package-heading"><div><b>{adapter.label}</b><p>{adapter.origins.join(" · ")} · v{adapter.version}</p></div><span>{adapter.encryption === "client-aes-gcm" ? "ENCRYPTED" : "TEMPLATE"}</span></div><ToolRows tools={adapter.tools} />

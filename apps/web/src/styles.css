@@ -15,10 +15,13 @@ nav { height: 84px; display: flex; align-items: center; justify-content: space-b
 h1 { margin: 20px 0 26px; max-width: 880px; font-size: clamp(58px, 10vw, 138px); line-height: .83; letter-spacing: -.08em; font-weight: 600; }
 h1 em { color: #6a00ff; font-style: normal; }
 .lede { max-width: 680px; font-size: clamp(18px, 2vw, 25px); line-height: 1.5; color: #4f5a52; }
-.starter-prompt { max-width: 760px; margin-top: 28px; border: 1px solid #18211b; background: #d7ff4f; padding: 18px 20px; box-shadow: 6px 6px 0 #6a00ff; }
-.starter-prompt b { font: 500 10px DM Mono, monospace; letter-spacing: .12em; color: #6a00ff; }
-.starter-prompt p { margin: 9px 0 0; font: 500 14px/1.5 DM Mono, monospace; }
-.starter-prompt q { quotes: "“" "”"; }
+.starter-prompt { max-width: 760px; margin-top: 28px; }
+.starter-prompt > strong { display: block; margin-bottom: 9px; font-size: 16px; }
+.starter-prompt button { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 22px; border: 1px solid #18211b; background: #d7ff4f; padding: 18px 20px; color: #18211b; text-align: left; cursor: pointer; box-shadow: 6px 6px 0 #6a00ff; }
+.starter-prompt button:hover { transform: translate(-2px, -2px); box-shadow: 8px 8px 0 #6a00ff; }
+.starter-prompt button:focus-visible { outline: 3px solid #6a00ff; outline-offset: 4px; }
+.starter-prompt button b { font: 600 15px/1.55 DM Mono, monospace; }
+.starter-prompt button span { flex: 0 0 auto; font: 500 11px DM Mono, monospace; letter-spacing: .08em; color: #6a00ff; }
 .status { display: inline-flex; align-items: center; gap: 10px; margin-top: 28px; border: 1px solid #18211b33; background: #fff9; padding: 12px 15px; font: 500 12px DM Mono, monospace; }
 .status span { width: 8px; height: 8px; border-radius: 50%; background: #aaa; }
 .status-registered span, .status-already_registered span { background: #48be65; box-shadow: 0 0 0 4px #48be6522; }
@@ -94,5 +97,5 @@ footer { padding: 22px 0 32px; border-top: 1px solid #18211b33; display: flex; j
 .private-list a { display: grid; gap: 6px; padding: 18px 0; border-bottom: 1px solid #18211b55; }
 .private-list span { color: #59635b; font: 400 10px DM Mono, monospace; }
 .notice { margin-top: 28px; padding: 16px; background: #d7ff4f55; font-size: 14px; line-height: 1.5; }
-@media (max-width: 720px) { .flow { grid-template-columns: 1fr; } .flow article + article { border-left: 0; border-top: 1px solid #18211b; padding-left: 0; } .catalog-heading { align-items: start; flex-direction: column; } .adapter-list article { grid-template-columns: 34px 1fr; padding: 24px 0; } .adapter-list span, .adapter-list code { grid-column: 2; justify-self: start; } nav > a:last-child { display: none; } }
+@media (max-width: 720px) { .flow { grid-template-columns: 1fr; } .flow article + article { border-left: 0; border-top: 1px solid #18211b; padding-left: 0; } .catalog-heading { align-items: start; flex-direction: column; } .adapter-list article { grid-template-columns: 34px 1fr; padding: 24px 0; } .adapter-list span, .adapter-list code { grid-column: 2; justify-self: start; } .starter-prompt button { align-items: start; flex-direction: column; } nav > a:last-child { display: none; } }
 @media (max-width: 720px) { .workspace-grid { grid-template-columns: 1fr; } .workspace-header, .library-heading, .package-heading { align-items: start; flex-direction: column; } .tool-row { grid-template-columns: 1fr; gap: 8px; } .tool-row > span { justify-self: start; } .nav-actions a:last-child { display: none; } }

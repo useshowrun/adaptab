@@ -10,7 +10,9 @@ type AdapterSummary = {
   product: string;
   tools: Array<{ name: string; readOnly: boolean }>;
 };
-type PrivateConnection = "loading" | "signed_out" | { tools: number };
+type PrivateConnection = "loading" | "signed_out" | { adapters: number };
+
+const starterPrompt = "Open adaptab.netlify.app/start and use AdapTab for all relevant open tabs.";
 
 export default function App() {
   return location.pathname === "/workspace" || location.pathname.startsWith("/tools/") ? <Workspace /> : <PublicCatalog />;
@@ -20,6 +22,7 @@ function PublicCatalog() {
   const [state, setState] = useState<BootstrapState>("loading");
   const [adapters, setAdapters] = useState<AdapterSummary[]>([]);
   const [privateConnection, setPrivateConnection] = useState<PrivateConnection>("loading");
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     registerBootstrapTools().then(setState).catch(() => setState("error"));
@@ -41,10 +44,7 @@ function PublicCatalog() {
         if (response.status === 401) return setPrivateConnection("signed_out");
         if (!response.ok) throw new Error("Private workspace unavailable");
         const body = await response.json();
-        const tools = Array.isArray(body.tools)
-          ? body.tools.reduce((total: number, adapter: { tools?: unknown[] }) => total + (Array.isArray(adapter.tools) ? adapter.tools.length : 0), 0)
-          : 0;
-        setPrivateConnection({ tools });
+        setPrivateConnection({ adapters: Array.isArray(body.tools) ? body.tools.length : 0 });
       })
       .catch(() => setPrivateConnection("signed_out"));
   }, []);
@@ -60,7 +60,7 @@ function PublicCatalog() {
     ? " Checking your private library…"
     : privateConnection === "signed_out"
       ? " Public catalog active; sign in to include private tools."
-      : ` ${privateConnection.tools} private ${privateConnection.tools === 1 ? "tool" : "tools"} connected.`;
+      : ` ${privateConnection.adapters} private ${privateConnection.adapters === 1 ? "adapter" : "adapters"} connected.`;
   const message = state === "registered" || state === "already_registered"
     ? bootstrapMessage + privateMessage
     : bootstrapMessage;
@@ -73,8 +73,15 @@ function PublicCatalog() {
         <h1>WebMCP for<br /><em>every tab.</em></h1>
         <p className="lede">Give an agent one starting page. AdapTab resolves the smallest matching adapter from the public catalog and your signed-in private library—using your live browser session, without exporting credentials.</p>
         <div className="starter-prompt">
-          <b>ONE-LINE START</b>
-          <p>Tell your agent: <q>Open adaptab.netlify.app/start and use AdapTab for my other open tab.</q></p>
+          <strong>Tell your agent:</strong>
+          <button type="button" onClick={async () => {
+            await navigator.clipboard.writeText(starterPrompt);
+            setCopied(true);
+            window.setTimeout(() => setCopied(false), 1800);
+          }} aria-label="Copy the AdapTab starting prompt">
+            <b>{starterPrompt}</b>
+            <span aria-live="polite">{copied ? "COPIED" : "CLICK TO COPY"}</span>
+          </button>
         </div>
         <div className={`status status-${state}`}><span aria-hidden="true" />{message}</div>
       </section>

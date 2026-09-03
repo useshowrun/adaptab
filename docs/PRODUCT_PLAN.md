@@ -66,13 +66,17 @@ Authenticated target document
 
 The first-run prompt should be approximately:
 
-> Open the AdapTab start page. Use its tools to activate the smallest matching
-> adapter for my other open browser tab, then perform my requested task.
+> Open adaptab.netlify.app/start and use AdapTab for all relevant open tabs.
 
 This gives the agent a single bootstrap surface. The agent does not need a
 separate Showrun skill for each website. A remote MCP server may later expose
 the same catalog independently of a page, but it is not required for the MVP
 and does not by itself solve authenticated cross-origin execution.
+
+The plural prompt is an agent policy, not a bulk-injection primitive. The agent
+enumerates relevant tabs, resolves each URL and task independently, and equips
+only compatible top-level documents. Per-origin approval and per-document
+lifecycle rules continue to apply.
 
 When the start-page request carries a valid AdapTab session,
 `adaptab_resolve` merges route-matched public adapters with safe metadata for

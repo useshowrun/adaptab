@@ -39,12 +39,17 @@ Open the [live AdapTab start page](https://adaptab.netlify.app/start) and one
 supported target page in ChatGPT's in-app browser. Enable full CDP access for
 the target only when ChatGPT requests it, then ask:
 
-> Open adaptab.netlify.app/start and use AdapTab for my other open tab.
+> Open adaptab.netlify.app/start and use AdapTab for all relevant open tabs.
 
 The bootstrap tools provide the precise resolve, verify, inject, and rediscover
 instructions to the agent. When the user is signed in, the same resolver
 searches both the reviewed public catalog and that owner's private library;
 private source remains lazy, owner-checked, and `no-store`.
+
+“All relevant” is deliberate: the agent processes open tabs individually and
+activates only those with a route- and intent-compatible adapter. Each browser
+document still has its own injection lifecycle and may require its own CDP
+approval.
 
 For a no-login test, open `https://news.ycombinator.com/` and ask for the
 current Hacker News front page, or open `https://raising.fi/` and ask for
