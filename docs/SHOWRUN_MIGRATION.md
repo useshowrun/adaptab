@@ -38,7 +38,7 @@ two infrastructure/meta skills (`chrome-cdp` and `showrun`).
 
 | Showrun knowledge | AdapTab adapter | Important conversion |
 | --- | --- | --- |
-| `raisingfi/funding` | `raising-fi.public.funding@1.0.0` | Same-origin public request, bounded funding preview |
+| `raisingfi/funding` | `raising-fi.public.funding@1.1.0` | Same-origin public request, full available funding fields with bounded record count |
 | `github/user-repos` | `github.public.user-research@1.0.0` | Three typed read tools; fixed GitHub API origin; credentials omitted |
 | `hackernews/stories` | `hacker-news.public.front-page@1.0.0` | One DOM-backed read tool; no network request; maximum ten current stories |
 | `linkedin/legacy/search` | `linkedin.core.company-search@1.0.0` | Live-session CSRF stays in page; company-only result schema |

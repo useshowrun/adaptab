@@ -2,7 +2,7 @@ import type { AdapterManifest } from "../../packages/adapter-sdk/src/types";
 
 export const raisingFiManifest: AdapterManifest = {
   id: "raising-fi.public.funding",
-  version: "1.0.0",
+  version: "1.1.0",
   publisher: "adaptab",
   visibility: "public",
   execution: "page",
@@ -24,7 +24,7 @@ export const raisingFiManifest: AdapterManifest = {
     {
       name: "adaptab_raising_fi_list_recent_funding",
       description:
-        "List a small number of recent public startup funding records from Raising.fi. Returns only company name, raise date, and industry.",
+        "List up to 40 recent public startup funding records from Raising.fi with every currently available public funding field, including amount, round, location, investors, website, description, and hiring signals when present.",
       routeFamily: "public",
       readOnly: true,
       requiresConfirmation: false,
@@ -34,9 +34,9 @@ export const raisingFiManifest: AdapterManifest = {
           limit: {
             type: "integer",
             minimum: 1,
-            maximum: 10,
-            default: 3,
-            description: "Maximum records to return.",
+            maximum: 40,
+            default: 10,
+            description: "Maximum records to return from Raising.fi's current public dataset.",
           },
         },
         additionalProperties: false,

@@ -1,7 +1,34 @@
-export const raisingFiBundleSource = String.raw`(async () => {
+import type { AdapterManifest } from "../../packages/adapter-sdk/src/types";
+
+export const raisingFiManifestV1: AdapterManifest = {
+  id: "raising-fi.public.funding",
+  version: "1.0.0",
+  publisher: "adaptab",
+  visibility: "public",
+  execution: "page",
+  product: "Raising.fi public funding",
+  origins: ["https://raising.fi", "https://www.raising.fi"],
+  pathPatterns: ["/*"],
+  intentPatterns: ["funding", "funded", "fundraise", "fundraising", "investment", "raised", "recent rounds", "startup rounds"],
+  networkAllowlist: ["/api/funding"],
+  tools: [{
+    name: "adaptab_raising_fi_list_recent_funding",
+    description: "List a small number of recent public startup funding records from Raising.fi. Returns only company name, raise date, and industry.",
+    routeFamily: "public",
+    readOnly: true,
+    requiresConfirmation: false,
+    inputSchema: {
+      type: "object",
+      properties: { limit: { type: "integer", minimum: 1, maximum: 10, default: 3, description: "Maximum records to return." } },
+      additionalProperties: false,
+    },
+  }],
+};
+
+export const raisingFiBundleSourceV1 = String.raw`(async () => {
   "use strict";
   const ADAPTER_ID = "raising-fi.public.funding";
-  const VERSION = "1.1.0";
+  const VERSION = "1.0.0";
   const TOOL_NAME = "adaptab_raising_fi_list_recent_funding";
   const ALLOWED_ORIGINS = new Set(["https://raising.fi", "https://www.raising.fi"]);
   const marker = "__adaptab__" + ADAPTER_ID.replace(/[^a-z0-9]/gi, "_");
@@ -28,11 +55,11 @@ export const raisingFiBundleSource = String.raw`(async () => {
   try {
     await document.modelContext.registerTool({
       name: TOOL_NAME,
-      description: "List up to 40 recent public startup funding records from Raising.fi with every currently available public funding field, including amount, round, location, investors, website, description, and hiring signals when present.",
+      description: "List a small number of recent public startup funding records from Raising.fi. Returns only company name, raise date, and industry.",
       inputSchema: {
         type: "object",
         properties: {
-          limit: { type: "integer", minimum: 1, maximum: 40, default: 10, description: "Maximum records to return from Raising.fi's current public dataset." }
+          limit: { type: "integer", minimum: 1, maximum: 10, default: 3, description: "Maximum records to return." }
         },
         additionalProperties: false
       },
@@ -41,9 +68,9 @@ export const raisingFiBundleSource = String.raw`(async () => {
         if (!input || typeof input !== "object" || Array.isArray(input) || Object.keys(input).some((key) => key !== "limit")) {
           throw new Error("Input must be an object containing only an optional limit.");
         }
-        const requested = input.limit ?? 10;
-        if (typeof requested !== "number" || !Number.isInteger(requested) || requested < 1 || requested > 40) {
-          throw new Error("limit must be an integer from 1 through 40.");
+        const requested = input.limit ?? 3;
+        if (typeof requested !== "number" || !Number.isInteger(requested) || requested < 1 || requested > 10) {
+          throw new Error("limit must be an integer from 1 through 10.");
         }
 
         const controller = new AbortController();
@@ -64,55 +91,17 @@ export const raisingFiBundleSource = String.raw`(async () => {
           if (!payload || !Array.isArray(payload.data)) {
             throw new Error("Raising.fi returned an unexpected response shape.");
           }
-          const text = (value) => typeof value === "string" ? value : null;
-          const number = (value) => typeof value === "number" && Number.isFinite(value) ? value : null;
-          const hiring = (value) => {
-            if (!value || typeof value !== "object" || Array.isArray(value)) return null;
-            const roles = value.rolesByFunction && typeof value.rolesByFunction === "object" && !Array.isArray(value.rolesByFunction)
-              ? Object.fromEntries(Object.entries(value.rolesByFunction).slice(0, 20).filter(([key, count]) => /^[a-z][a-z0-9_]{0,40}$/i.test(key) && typeof count === "number" && Number.isFinite(count)))
-              : {};
-            const strings = (input) => Array.isArray(input) ? input.filter((entry) => typeof entry === "string").slice(0, 20) : [];
-            return {
-              checkedAt: text(value.checkedAt),
-              hiringScore: number(value.hiringScore),
-              openRoles: number(value.openRoles),
-              rolesByFunction: roles,
-              signals: strings(value.signals),
-              tools: strings(value.tools)
-            };
-          };
           const records = payload.data.slice(0, requested).map((item) => ({
-            id: text(item?.id),
-            companyName: text(item?.companyName),
-            slug: text(item?.slug),
-            website: text(item?.website),
-            companyDescription: text(item?.companyDescription),
-            industry: text(item?.industry),
-            amountRaised: text(item?.amountRaised),
-            amountUsd: number(item?.amountUsd),
-            raiseType: text(item?.raiseType),
-            location: text(item?.location),
-            leadInvestor: text(item?.leadInvestor),
-            investors: text(item?.investors),
-            dateOfRaise: text(item?.dateOfRaise),
-            hiring: hiring(item?.hiring)
+            companyName: typeof item?.companyName === "string" ? item.companyName : null,
+            dateOfRaise: typeof item?.dateOfRaise === "string" ? item.dateOfRaise : null,
+            industry: typeof item?.industry === "string" ? item.industry : null
           }));
           return {
             ok: true,
             source: "Raising.fi",
             count: records.length,
             records,
-            isPremium: typeof payload.isPremium === "boolean" ? payload.isPremium : null,
-            totalRaisedUsd: number(payload.totalRaisedUsd),
-            message: text(payload.message),
-            pagination: {
-              page: number(payload.pagination?.page),
-              limit: number(payload.pagination?.limit),
-              total: number(payload.pagination?.total),
-              totalPages: number(payload.pagination?.totalPages),
-              hasNextPage: typeof payload.pagination?.hasNextPage === "boolean" ? payload.pagination.hasNextPage : null,
-              hasPrevPage: typeof payload.pagination?.hasPrevPage === "boolean" ? payload.pagination.hasPrevPage : null
-            }
+            page: Number(payload.pagination?.page ?? 1)
           };
         } catch (error) {
           if (error?.name === "AbortError") throw new Error("Raising.fi request timed out after 12 seconds.");

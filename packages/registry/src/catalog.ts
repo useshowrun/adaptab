@@ -4,6 +4,7 @@ import { githubPublicManifest } from "../../../adapters/github/public/manifest";
 import { hackerNewsPublicBundleSource } from "../../../adapters/hacker-news/public/bundle";
 import { hackerNewsPublicManifest } from "../../../adapters/hacker-news/public/manifest";
 import { raisingFiBundleSource } from "../../../adapters/raising-fi/bundle";
+import { raisingFiBundleSourceV1, raisingFiManifestV1 } from "../../../adapters/raising-fi/legacy-v1";
 import { raisingFiManifest } from "../../../adapters/raising-fi/manifest";
 import { linkedinCoreBundleSource } from "../../../adapters/linkedin/core/bundle";
 import { linkedinCoreManifest } from "../../../adapters/linkedin/core/manifest";
@@ -15,12 +16,32 @@ import type { BundleRecord, ClientKind, ResolveInput } from "../../adapter-sdk/s
 
 const bundles: BundleRecord[] = [
   { manifest: raisingFiManifest, source: raisingFiBundleSource },
+  { manifest: raisingFiManifestV1, source: raisingFiBundleSourceV1 },
   { manifest: githubPublicManifest, source: githubPublicBundleSource },
   { manifest: hackerNewsPublicManifest, source: hackerNewsPublicBundleSource },
   { manifest: linkedinSearchOutreachManifest, source: linkedinSearchOutreachBundleSource },
   { manifest: linkedinCoreManifest, source: linkedinCoreBundleSource },
   { manifest: linkedinMessagingManifest, source: linkedinMessagingBundleSource },
 ];
+
+function compareVersions(left: string, right: string) {
+  const a = left.split(".").map(Number);
+  const b = right.split(".").map(Number);
+  for (let index = 0; index < 3; index += 1) {
+    if (a[index] !== b[index]) return a[index] - b[index];
+  }
+  return 0;
+}
+
+function latestPublicBundles() {
+  const latest = new Map<string, BundleRecord>();
+  for (const record of bundles) {
+    if (record.manifest.visibility !== "public") continue;
+    const current = latest.get(record.manifest.id);
+    if (!current || compareVersions(record.manifest.version, current.manifest.version) > 0) latest.set(record.manifest.id, record);
+  }
+  return [...latest.values()];
+}
 
 function normalizePathPattern(pattern: string): RegExp {
   const escaped = pattern.replace(/[.+?^${}()|[\]\\]/g, "\\$&").replaceAll("*", ".*");
@@ -54,8 +75,8 @@ export function resolveAdapter(input: ResolveInput) {
     return { matched: false as const, reason: "unsupported_client" as const };
   }
 
-  const siteCandidates = bundles.filter(({ manifest }) =>
-    manifest.visibility === "public" && manifest.origins.includes(target.origin) &&
+  const siteCandidates = latestPublicBundles().filter(({ manifest }) =>
+    manifest.origins.includes(target.origin) &&
     manifest.pathPatterns.some((pattern) => normalizePathPattern(pattern).test(target.pathname)),
   );
 
@@ -118,7 +139,7 @@ export function resolveAdapter(input: ResolveInput) {
 }
 
 export function listPublicAdapters() {
-  return bundles.filter(({ manifest }) => manifest.visibility === "public").map(({ manifest, source }) => ({
+  return latestPublicBundles().map(({ manifest, source }) => ({
     ...manifest,
     integrity: { algorithm: "sha256", value: sha256(source) },
   }));

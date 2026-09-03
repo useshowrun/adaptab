@@ -12,9 +12,10 @@ Last updated: 2026-09-03
   visibility classes and decrypts custom source in the browser.
 - Typed public adapter manifest and deterministic route/intent matcher.
 - Version-pinned inline bundles with SHA-256 integrity metadata.
-- `raising-fi.public.funding@1.0.0` with exact-origin enforcement, top-level
-  enforcement, idempotent installation, bounded inputs/outputs, timeout, and a
-  single same-origin network route.
+- `raising-fi.public.funding@1.1.0` with exact-origin enforcement, top-level
+  enforcement, idempotent installation, timeout, a single same-origin network
+  route, and all 14 currently available public record fields for up to the 40
+  records exposed by the site.
 - `linkedin.core.company-search@1.0.0` with route-aware selection, live-session
   CSRF derivation inside the page, bounded results, and no credential export.
 - `linkedin.messaging.send-message@1.0.0` with exact profile verification,
@@ -35,7 +36,7 @@ Last updated: 2026-09-03
 - Private-workspace code with Netlify Identity, owner-scoped Blobs storage,
   fixed-recipient declarative LinkedIn tools, and authenticated activation
   pages. Identity and the default GitHub provider are enabled in production.
-- Sixty automated tests plus production build validation.
+- Sixty-one automated tests plus production build validation.
 
 ## Verified in ChatGPT's integrated browser
 

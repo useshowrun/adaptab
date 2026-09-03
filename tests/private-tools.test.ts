@@ -228,7 +228,7 @@ describe("private tool authorization", () => {
     expect(resolved.status).toBe(200);
     expect(resolved.headers.get("cache-control")).toBe("public, max-age=60");
     const bundle = createBundleHandler({ currentUser: async () => null, repository, verifyOrigin: () => { throw new Error("should not run"); } });
-    const response = await bundle(post({ adapterId: "raising-fi.public.funding", version: "1.0.0", delivery: "inline" }));
+    const response = await bundle(post({ adapterId: "raising-fi.public.funding", version: "1.1.0", delivery: "inline" }));
     expect(response.status).toBe(200);
     expect(response.headers.get("cache-control")).toContain("public");
   });

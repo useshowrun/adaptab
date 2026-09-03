@@ -258,7 +258,8 @@ Implement and publish in this order:
 1. `raising-fi.public.funding`
    - Read-only.
    - Uses Raising.fi's known public JSON API from the target page.
-   - Returns a narrow preview schema.
+   - Returns every currently available public funding field for up to the 40
+     records exposed by the site's free dataset.
    - Primary no-auth demo.
 
 2. `linkedin.core.company-search`

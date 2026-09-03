@@ -60,7 +60,9 @@ trusted browser bridge performs cross-tab injection.
 
 The MVP ships six route- and intent-filtered adapters:
 
-- `raising-fi.public.funding@1.0.0` for the public Raising.fi funding preview.
+- `raising-fi.public.funding@1.1.0` for up to 40 recent public Raising.fi
+  records with all currently available funding fields, including amounts,
+  rounds, investors, locations, websites, descriptions, and hiring signals.
 - `github.public.user-research@1.0.0` for public user search, profile lookup,
   and top repositories by stars.
 - `hacker-news.public.front-page@1.0.0` for a bounded, network-free reading of

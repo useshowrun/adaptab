@@ -28,7 +28,7 @@ adds evidence.
   native target-page tool discovery, and live invocation.
 - Six reviewed adapters are implemented across Raising.fi, GitHub, Hacker
   News, and three LinkedIn product groups.
-- Sixty automated tests and repeated integrated-browser tests pass.
+- Sixty-one automated tests and repeated integrated-browser tests pass.
 - Of the eight original product requirement groups: one is MVP complete and
   seven are partial; the private-workspace requirement now has a tested narrow
   implementation rather than only a design.
@@ -335,7 +335,7 @@ Next acceptance milestone:
 
 | Adapter | State | Real-browser evidence |
 | --- | --- | --- |
-| `raising-fi.public.funding@1.0.0` | MVP complete | Public resolve, inject, invoke, reload, reinject |
+| `raising-fi.public.funding@1.1.0` | MVP complete | Public resolve, inject, invoke, reload, reinject; all current public funding fields |
 | `linkedin.core.company-search@1.0.0` | MVP complete | Authenticated company searches; credentials stayed in page |
 | `linkedin.messaging.send-message@1.0.0` | MVP complete | Exact recipient preview and two separately authorized production sends |
 | `linkedin.messaging.search-outreach@1.0.0` | MVP complete | Production resolve/hash/inject/preview and authorized two-recipient send verified |

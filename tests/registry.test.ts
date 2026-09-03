@@ -165,10 +165,20 @@ describe("adapter resolution", () => {
 
 describe("immutable bundle", () => {
   it("returns a stable SHA-256 and strict origin guard", () => {
-    const record = getBundle("raising-fi.public.funding", "1.0.0");
+    const record = getBundle("raising-fi.public.funding", "1.1.0");
     expect(record).toBeDefined();
     expect(sha256(record!.source)).toMatch(/^[a-f0-9]{64}$/);
     expect(record!.source).toContain("ALLOWED_ORIGINS");
     expect(record!.source).toContain("credentials: \"same-origin\"");
+  });
+
+  it("keeps the original Raising.fi bundle addressable after publishing its expanded schema", () => {
+    const legacy = getBundle("raising-fi.public.funding", "1.0.0");
+    expect(legacy).toBeDefined();
+    expect(sha256(legacy!.source)).toBe("ffb9e5e75d6ee8687f00b8231e65091667ce93c17b6429b31a13af3a1e88ce0b");
+    expect(resolveAdapter({ url: "https://raising.fi/", intent: "funding", client: "cdp" })).toMatchObject({
+      matched: true,
+      match: { version: "1.1.0" },
+    });
   });
 });
