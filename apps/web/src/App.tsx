@@ -15,7 +15,10 @@ export default function App() {
 
   useEffect(() => {
     registerBootstrapTools().then(setState).catch(() => setState("error"));
-    fetch("/api/catalog", { headers: { accept: "application/json" } })
+    fetch(`/api/catalog?fresh=${Date.now()}`, {
+      cache: "no-store",
+      headers: { accept: "application/json" },
+    })
       .then((response) => {
         if (!response.ok) throw new Error("Catalog unavailable");
         return response.json();

@@ -94,9 +94,10 @@ draft was confirmed once, and LinkedIn again reported a successful send.
 
 ## GitHub public adapter test
 
-The local AdapTab catalog resolved `github.public.user-research@1.0.0` for an
-open authenticated GitHub repository page. Its integrity values matched, CDP
-installed the bundle, and native WebMCP discovered three read-only tools.
+Both the local and deployed AdapTab catalogs resolved
+`github.public.user-research@1.0.0` for an open authenticated GitHub repository
+page. Their integrity values matched, CDP installed the production bundle, and
+native WebMCP discovered three read-only tools.
 
 Live calls successfully:
 
@@ -115,8 +116,9 @@ restricts fetch connections.
 
 That prototype was not published. It was replaced with
 `hacker-news.public.front-page@1.0.0`, a network-free tool that reads the
-current top-level Hacker News document. After a clean reload and injection,
-native WebMCP returned three live front-page stories with bounded metadata.
+current top-level Hacker News document. Both local and production bundles were
+tested after clean reloads; native WebMCP returned live front-page stories with
+bounded metadata.
 
 ## Conclusions supported by the experiments
 

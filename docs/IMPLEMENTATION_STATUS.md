@@ -57,13 +57,15 @@ ambiguous-outcome, expiry boundary, origin guard, and recipient-validation
 behavior are covered by mocks. No real message was sent during this
 implementation pass.
 
+The GitHub and Hacker News adapters were each resolved from the public Netlify
+catalog, hash-matched, installed into clean target documents, rediscovered as
+native WebMCP tools, and invoked successfully against live page data.
+
 This verifies the no-extension MVP path. It still requires a client with an
 approved page-injection capability such as full CDP access.
 
 ## Next
 
-1. Verify the GitHub and Hacker News groups from the deployed catalog in clean
-   target documents.
-2. Record the sub-three-minute demo and complete the Devpost submission.
-3. Add a guided adapter-authoring workflow using the existing manifests as
+1. Record the sub-three-minute demo and complete the Devpost submission.
+2. Add a guided adapter-authoring workflow using the existing manifests as
    examples and Showrun only as prior-art reference material.
