@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { getBundle, resolveAdapter, sha256 } from "../packages/registry/src/catalog";
+import { resolveAvailableAdapters } from "../packages/registry/src/available";
+import { createPrivateToolRecord } from "../packages/private-tools/src/index";
 
 describe("adapter resolution", () => {
   it("matches the Raising.fi funding intent", () => {
@@ -113,6 +115,51 @@ describe("adapter resolution", () => {
       intent: "Hacker News",
       client: "cdp",
     }).matched).toBe(false);
+  });
+
+  it("merges route-matched private adapters without overriding an unrelated public intent", () => {
+    const privateRecord = createPrivateToolRecord("owner-a", {
+      label: "Leadership circle",
+      recipientProfileUrls: ["https://www.linkedin.com/in/example"],
+    });
+    const result = resolveAvailableAdapters({
+      url: "https://www.linkedin.com/search/results/companies/",
+      intent: "search LinkedIn companies",
+      client: "chatgpt-integrated-browser",
+    }, [privateRecord], true);
+    expect(result.matched).toBe(true);
+    if (result.matched) expect(result.match).toMatchObject({ adapterId: "linkedin.core.company-search", visibility: "public" });
+    expect(result.access.privateWorkspace).toBe("connected");
+    expect(result.availableAdapters.some((adapter) => adapter.adapterId === `private.${privateRecord.id}`)).toBe(true);
+    expect(JSON.stringify(result.availableAdapters)).not.toContain("linkedin.com/in/example");
+  });
+
+  it("selects an owner-private adapter only when the intent identifies it", () => {
+    const privateRecord = createPrivateToolRecord("owner-a", {
+      label: "Leadership circle",
+      recipientProfileUrls: ["https://www.linkedin.com/in/example"],
+    });
+    const result = resolveAvailableAdapters({
+      url: "https://www.linkedin.com/feed/",
+      intent: "use my private Leadership circle tool",
+      client: "cdp",
+    }, [privateRecord], true);
+    expect(result.matched).toBe(true);
+    if (result.matched) {
+      expect(result.match).toMatchObject({
+        adapterId: `private.${privateRecord.id}`,
+        visibility: "private",
+        toolUrl: `/tools/${privateRecord.id}`,
+      });
+      expect(result.activation.nextTool).toBe("adaptab_get_bundle");
+      expect(result.tools).toHaveLength(2);
+    }
+  });
+
+  it("reports a connected but empty private workspace distinctly from signed out", () => {
+    const input = { url: "https://raising.fi/", intent: "recent", client: "cdp" as const };
+    expect(resolveAvailableAdapters(input, [], true).access.privateWorkspace).toBe("connected");
+    expect(resolveAvailableAdapters(input, [], false).access.privateWorkspace).toBe("signed_out");
   });
 });
 

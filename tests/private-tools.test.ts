@@ -8,6 +8,8 @@ import {
   type PrivateToolRepository,
 } from "../packages/private-tools/src/index";
 import { createPrivateBundleHandler } from "../netlify/functions/private-bundle.mts";
+import { createBundleHandler } from "../netlify/functions/bundle.mts";
+import { createResolveHandler } from "../netlify/functions/resolve.mts";
 import { createPrivateToolHandler } from "../netlify/functions/private-tool.mts";
 import { createPrivateToolsHandler } from "../netlify/functions/private-tools.mts";
 import { listPublicAdapters } from "../packages/registry/src/catalog";
@@ -164,5 +166,70 @@ describe("private tool authorization", () => {
     expect(payload.source).toBeUndefined();
     expect(payload.encryptedSource.ciphertext).toBe("B".repeat(32));
     expect(payload.integrity.value).toBe("b".repeat(64));
+  });
+
+  it("resolves the signed-in owner's private adapters through the shared bootstrap endpoint", async () => {
+    const repository = new MemoryRepository();
+    const record = createPrivateToolRecord("owner-a", { label: "Leadership circle", recipientProfileUrls: ["https://www.linkedin.com/in/example"] });
+    await repository.put(record);
+    let originChecked = false;
+    const handler = createResolveHandler({
+      currentUser: async () => ({ id: "owner-a" }),
+      repository,
+      verifyOrigin: () => { originChecked = true; },
+    });
+    const response = await handler(post({
+      url: "https://www.linkedin.com/feed/",
+      intent: "use my private Leadership circle tool",
+      client: "chatgpt-integrated-browser",
+    }));
+    const payload = await response.json();
+    expect(response.status).toBe(200);
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
+    expect(originChecked).toBe(true);
+    expect(payload.match.adapterId).toBe(`private.${record.id}`);
+  });
+
+  it("does not reveal another owner's adapter through shared resolution", async () => {
+    const repository = new MemoryRepository();
+    const record = createPrivateToolRecord("owner-a", { label: "Leadership circle", recipientProfileUrls: ["https://www.linkedin.com/in/example"] });
+    await repository.put(record);
+    const handler = createResolveHandler({ currentUser: async () => ({ id: "owner-b" }), repository, verifyOrigin: () => {} });
+    const response = await handler(post({
+      url: "https://www.linkedin.com/feed/",
+      intent: "use my private Leadership circle tool",
+      client: "cdp",
+    }));
+    const payload = await response.json();
+    expect(payload.matched).toBe(false);
+    expect(JSON.stringify(payload)).not.toContain(record.id);
+  });
+
+  it("uses the shared bundle endpoint for private delivery while preserving owner isolation", async () => {
+    const repository = new MemoryRepository();
+    const record = createPrivateToolRecord("owner-a", { label: "Leadership circle", recipientProfileUrls: ["https://www.linkedin.com/in/example"] });
+    await repository.put(record);
+    let ownerId = "owner-b";
+    const handler = createBundleHandler({ currentUser: async () => ({ id: ownerId }), repository, verifyOrigin: () => {} });
+    const denied = await handler(post({ adapterId: `private.${record.id}`, version: record.version, delivery: "inline" }));
+    expect(denied.status).toBe(404);
+    ownerId = "owner-a";
+    const allowed = await handler(post({ adapterId: `private.${record.id}`, version: record.version, delivery: "inline" }));
+    const payload = await allowed.json();
+    expect(allowed.status).toBe(200);
+    expect(allowed.headers.get("cache-control")).toBe("private, no-store");
+    expect(payload.source).toContain("document.modelContext.registerTool");
+  });
+
+  it("keeps public resolution and bundle delivery usable without authentication", async () => {
+    const repository = new MemoryRepository();
+    const resolve = createResolveHandler({ currentUser: async () => null, repository, verifyOrigin: () => { throw new Error("should not run"); } });
+    const resolved = await resolve(post({ url: "https://raising.fi/", intent: "recently funded startups", client: "cdp" }));
+    expect(resolved.status).toBe(200);
+    expect(resolved.headers.get("cache-control")).toBe("public, max-age=60");
+    const bundle = createBundleHandler({ currentUser: async () => null, repository, verifyOrigin: () => { throw new Error("should not run"); } });
+    const response = await bundle(post({ adapterId: "raising-fi.public.funding", version: "1.0.0", delivery: "inline" }));
+    expect(response.status).toBe(200);
+    expect(response.headers.get("cache-control")).toContain("public");
   });
 });

@@ -1,4 +1,5 @@
 import { postJson } from "./api";
+import { materializePrivateBundle } from "./private-crypto";
 
 const bootstrapMarker = "__adaptabBootstrapV1";
 
@@ -14,7 +15,7 @@ export async function registerBootstrapTools(): Promise<"registered" | "already_
     const registrations = [modelContext.registerTool({
       name: "adaptab_resolve",
       description:
-        "Resolve a target page URL and task intent to the smallest compatible AdapTab WebMCP adapter. This reads the public adapter catalog and does not access the target page.",
+        "Resolve a target page URL and task intent to the smallest compatible AdapTab WebMCP adapter. This checks the public catalog plus the signed-in owner's private library, without accessing the target page.",
       inputSchema: {
         type: "object",
         properties: {
@@ -32,7 +33,7 @@ export async function registerBootstrapTools(): Promise<"registered" | "already_
     modelContext.registerTool({
       name: "adaptab_get_bundle",
       description:
-        "Get an immutable AdapTab page-installer bundle and its SHA-256 integrity value for a previously resolved adapter version.",
+        "Get an immutable public or owner-authorized private AdapTab page-installer bundle and its SHA-256 integrity value for a previously resolved adapter version. Encrypted private source is decrypted only in this browser.",
       inputSchema: {
         type: "object",
         properties: {
@@ -44,7 +45,9 @@ export async function registerBootstrapTools(): Promise<"registered" | "already_
         additionalProperties: false,
       },
       annotations: { readOnlyHint: true },
-      execute: (input) => postJson("/api/bundle", input),
+      execute: async (input) => materializePrivateBundle(
+        await postJson<Record<string, unknown>>("/api/bundle", input),
+      ),
     }),
 
     modelContext.registerTool({

@@ -1,6 +1,6 @@
 import { getUser, verifyRequestOrigin } from "@netlify/identity";
 import type { Config } from "@netlify/functions";
-import { buildPrivateToolBundle, getPrivateToolManifest, type PrivateToolRepository } from "../../packages/private-tools/src/index";
+import { createPrivateBundlePayload, type PrivateToolRepository } from "../../packages/private-tools/src/index";
 import { assertKeys, handleError, HttpError, json, parseJsonBody, requireString } from "./_shared/http.mts";
 import { BlobPrivateToolRepository } from "./_shared/private-tools.mts";
 
@@ -29,35 +29,7 @@ export function createPrivateBundleHandler(dependencies: Dependencies) {
       if (delivery !== "inline") throw new HttpError(400, "unsupported_delivery", "Only inline delivery is available.");
       const record = await dependencies.repository.get(user.id, toolId);
       if (!record) throw new HttpError(404, "private_tool_not_found", "This private tool is unavailable to the signed-in user.");
-      if (record.kind === "encrypted-custom") {
-        const manifest = getPrivateToolManifest(record);
-        return json({
-          adapterId: manifest.id,
-          version: manifest.version,
-          delivery,
-          encrypted: true,
-          encryptedSource: record.encryptedSource,
-          integrity: { algorithm: "sha256", value: record.sourceHash },
-          expectedOrigins: manifest.origins,
-          expectedPaths: manifest.pathPatterns,
-          tools: manifest.tools,
-          activation: { method: "client-decrypt-then-cdp-runtime-evaluate", cdp: { method: "Runtime.evaluate", expressionFrom: "decryptedSource", params: { awaitPromise: true, returnByValue: true } } },
-          lifecycle: { scope: "current_document", documentNavigation: "reinjection_required", newTab: "separate_injection_required" },
-        }, 200, { "cache-control": "private, no-store" });
-      }
-      const bundle = buildPrivateToolBundle(record);
-      return json({
-        adapterId: bundle.manifest.id,
-        version: bundle.manifest.version,
-        delivery,
-        source: bundle.source,
-        integrity: bundle.integrity,
-        expectedOrigins: bundle.manifest.origins,
-        expectedPaths: bundle.manifest.pathPatterns,
-        tools: bundle.manifest.tools,
-        activation: { method: "cdp-runtime-evaluate", cdp: { method: "Runtime.evaluate", expressionFrom: "source", params: { awaitPromise: true, returnByValue: true } } },
-        lifecycle: { scope: "current_document", documentNavigation: "reinjection_required", newTab: "separate_injection_required" },
-      }, 200, { "cache-control": "private, no-store" });
+      return json(createPrivateBundlePayload(record, delivery), 200, { "cache-control": "private, no-store" });
     } catch (error) { return handleError(error); }
   };
 }

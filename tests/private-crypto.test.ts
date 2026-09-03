@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { decryptPrivateBundle, encryptPrivateSource, savePrivateToolKey, wrapPrivateSource } from "../apps/web/src/private-crypto";
+import { decryptPrivateBundle, encryptPrivateSource, materializePrivateBundle, savePrivateToolKey, wrapPrivateSource } from "../apps/web/src/private-crypto";
 
 const originalLocalStorage = globalThis.localStorage;
 
@@ -42,5 +42,20 @@ describe("client-encrypted private adapters", () => {
       encryptedSource: { algorithm: "AES-GCM", iv: "AAAAAAAAAAAAAAAA", ciphertext: "BBBBBBBBBBBBBBBB" },
       integrity: { algorithm: "sha256", value: "a".repeat(64) },
     })).rejects.toThrow("local key is missing");
+  });
+
+  it("materializes an encrypted bundle through its shared private adapter identifier", async () => {
+    const toolId = "00000000-0000-4000-8000-000000000000";
+    const encrypted = await encryptPrivateSource("return { unified: true };", ["https://portal.example.com"]);
+    savePrivateToolKey(toolId, encrypted.key);
+    const result = await materializePrivateBundle({
+      adapterId: `private.${toolId}`,
+      encrypted: true,
+      encryptedSource: encrypted.encryptedSource,
+      integrity: { algorithm: "sha256", value: encrypted.sourceHash },
+    });
+    expect(result.decryptedInBrowser).toBe(true);
+    expect(result.source).toContain("unified: true");
+    expect(result.encryptedSource).toBeUndefined();
   });
 });

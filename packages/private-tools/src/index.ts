@@ -216,6 +216,35 @@ export function getPrivateToolManifest(record: PrivateToolRecord): AdapterManife
   return buildPrivateToolBundle(record).manifest;
 }
 
+export function createPrivateBundlePayload(record: PrivateToolRecord, delivery = "inline") {
+  const manifest = getPrivateToolManifest(record);
+  const base = {
+    adapterId: manifest.id,
+    version: manifest.version,
+    delivery,
+    expectedOrigins: manifest.origins,
+    expectedPaths: manifest.pathPatterns,
+    tools: manifest.tools,
+    lifecycle: { scope: "current_document", documentNavigation: "reinjection_required", newTab: "separate_injection_required" },
+  };
+  if (record.kind === "encrypted-custom") {
+    return {
+      ...base,
+      encrypted: true as const,
+      encryptedSource: record.encryptedSource,
+      integrity: { algorithm: "sha256" as const, value: record.sourceHash },
+      activation: { method: "client-decrypt-then-cdp-runtime-evaluate", cdp: { method: "Runtime.evaluate", expressionFrom: "decryptedSource", params: { awaitPromise: true, returnByValue: true } } },
+    };
+  }
+  const bundle = buildPrivateToolBundle(record);
+  return {
+    ...base,
+    source: bundle.source,
+    integrity: bundle.integrity,
+    activation: { method: "cdp-runtime-evaluate", cdp: { method: "Runtime.evaluate", expressionFrom: "source", params: { awaitPromise: true, returnByValue: true } } },
+  };
+}
+
 export function buildPrivateToolBundle(record: PrivateToolRecord) {
   if (record.kind === "encrypted-custom" || !record.recipientProfileUrls) throw new Error("This record uses encrypted custom bundle delivery.");
   const suffix = record.id.replace(/-/g, "").slice(0, 8);

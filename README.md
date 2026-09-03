@@ -39,10 +39,12 @@ Open the [live AdapTab start page](https://adaptab.netlify.app/start) and one
 supported target page in ChatGPT's in-app browser. Enable full CDP access for
 the target only when ChatGPT requests it, then ask:
 
-> Use AdapTab to equip my open target tab for the task I request. Resolve the
-> smallest matching adapter, fetch the exact bundle, verify its SHA-256 and
-> expected origin, inject it with CDP Runtime.evaluate, rediscover its WebMCP
-> tools, and use the relevant tool.
+> Open adaptab.netlify.app/start and use AdapTab for my other open tab.
+
+The bootstrap tools provide the precise resolve, verify, inject, and rediscover
+instructions to the agent. When the user is signed in, the same resolver
+searches both the reviewed public catalog and that owner's private library;
+private source remains lazy, owner-checked, and `no-store`.
 
 For a no-login test, open `https://news.ycombinator.com/` and ask for the
 current Hacker News front page, or open `https://raising.fi/` and ask for
@@ -72,9 +74,11 @@ recipient-group template or import a custom adapter for any HTTPS origin. The
 workspace lists every individual WebMCP tool inside each adapter package.
 Custom source is AES-GCM encrypted in the browser before upload; Netlify stores
 the ciphertext and the decryption key stays in that browser profile. Private
-records are excluded from `/api/catalog` and delivered only after a server-side
-owner check. An opaque `/tools/<id>` URL locates the tool but never authorizes
-access by itself.
+records never enter `/api/catalog`; authenticated `/api/resolve` can merge
+their safe metadata into results, and `/api/bundle` delivers their source only
+after a server-side owner check. The start-page client decrypts custom source
+locally. An opaque `/tools/<id>` URL locates a tool but never authorizes access
+by itself.
 
 From a clean target tab, the tested flow is:
 

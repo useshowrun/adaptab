@@ -28,7 +28,7 @@ adds evidence.
   native target-page tool discovery, and live invocation.
 - Six reviewed adapters are implemented across Raising.fi, GitHub, Hacker
   News, and three LinkedIn product groups.
-- Fifty automated tests and repeated integrated-browser tests pass.
+- Fifty-eight automated tests and repeated integrated-browser tests pass.
 - Of the eight original product requirement groups: one is MVP complete and
   seven are partial; the private-workspace requirement now has a tested narrow
   implementation rather than only a design.
@@ -50,6 +50,8 @@ Shipped:
 - Public start page: `https://adaptab.netlify.app/start`.
 - Four native bootstrap tools: resolve, get bundle, request adapter, and report
   result.
+- The same authenticated resolver and bundle tools include the owner's private
+  library, so private use does not require a second activation page.
 - Six reviewed, versioned adapters in the catalog.
 - Public catalog and target adapters verified in ChatGPT's integrated browser.
 
@@ -101,8 +103,11 @@ should stay in the browser.
 Shipped:
 
 - One bootstrap URL replaces per-site agent-skill installation.
-- `adaptab_resolve` returns only the smallest matching adapter metadata.
+- `adaptab_resolve` returns only the smallest matching adapter metadata and,
+  when signed in, considers both public and owner-private adapters.
 - Source is fetched only after resolution through `adaptab_get_bundle`.
+- The shared bundle tool locally decrypts custom private source using the key
+  in the current browser profile; the key never reaches Netlify.
 - Activation describes the exact `Runtime.evaluate` call, expected origins,
   expected paths, and reinjection lifecycle.
 - Authenticated requests execute in the target document; target cookies and
@@ -190,18 +195,23 @@ Shipped:
 - Custom source is wrapped with origin, path, and top-level guards, then
   AES-GCM encrypted in the browser. Netlify receives owner-scoped ciphertext,
   metadata, and an integrity hash but no plaintext source or key.
-- `/tools/<opaque-id>` exposes authenticated private info and bundle WebMCP
-  tools for easy agent activation.
+- `/start` resolves and retrieves both public and owner-private adapters through
+  its existing four bootstrap tools. `/tools/<opaque-id>` remains available as
+  a direct authenticated locator.
 - Every private Function performs an owner-scoped lookup, returns 404 across
   owners, and uses `private, no-store` delivery.
-- Private adapters are explicitly excluded from public resolve, bundle, and
-  catalog paths.
+- Private adapters remain excluded from `/api/catalog`. Authenticated resolve
+  merges safe route-matched metadata without recipient configuration or source;
+  shared bundle delivery still requires the server-side owner check.
 - The reviewed private template is production-verified end to end: owner-only
   bundle retrieval, hash verification, CDP injection, WebMCP discovery,
   explicit confirmation, and bounded at-most-once delivery.
 
 Missing:
 
+- Production fresh-session verification of unified `/start` private resolution
+  and shared bundle retrieval. Owner isolation and local decryption are covered
+  by automated tests.
 - Production cross-owner verification with a second account, plus deletion and
   export controls. The authenticated stored-record and injection path is
   verified with the primary owner.

@@ -77,3 +77,12 @@ export async function decryptPrivateBundle(toolId: string, bundle: EncryptedPriv
     throw new Error("The private adapter could not be decrypted or failed its integrity check.");
   }
 }
+
+export async function materializePrivateBundle(bundle: Record<string, unknown>) {
+  if (bundle.encrypted !== true) return bundle;
+  const adapterId = typeof bundle.adapterId === "string" ? bundle.adapterId : "";
+  const match = /^private\.([0-9a-f-]{36})$/i.exec(adapterId);
+  if (!match) throw new Error("The encrypted private adapter identifier is invalid.");
+  const source = await decryptPrivateBundle(match[1], bundle as unknown as EncryptedPrivateBundle);
+  return { ...bundle, source, encryptedSource: undefined, decryptedInBrowser: true };
+}

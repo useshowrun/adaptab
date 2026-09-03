@@ -1,5 +1,5 @@
 import { postJson } from "./api";
-import { decryptPrivateBundle, type EncryptedPrivateBundle } from "./private-crypto";
+import { materializePrivateBundle } from "./private-crypto";
 
 const markerPrefix = "__adaptabPrivateBootstrapV1_";
 const workspaceMarker = "__adaptabPrivateWorkspaceV1";
@@ -57,11 +57,7 @@ export async function registerPrivateBootstrapTools(toolId: string): Promise<"re
       execute: async (input) => {
         const value = input && typeof input === "object" ? input as Record<string, unknown> : {};
         const bundle = await postJson<Record<string, unknown>>("/api/private-bundle", { toolId, delivery: value.delivery });
-        if (bundle.encrypted === true) {
-          const source = await decryptPrivateBundle(toolId, bundle as unknown as EncryptedPrivateBundle);
-          return { ...bundle, source, encryptedSource: undefined, decryptedInBrowser: true };
-        }
-        return bundle;
+        return materializePrivateBundle(bundle);
       },
     })];
     await Promise.all(registrations);

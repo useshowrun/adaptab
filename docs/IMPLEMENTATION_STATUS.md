@@ -7,6 +7,9 @@ Last updated: 2026-09-03
 - Public production deployment: `https://adaptab.netlify.app/start`.
 - Vite + React start page with imperative top-level WebMCP registration.
 - Four bootstrap tools: resolve, get bundle, request adapter, and report result.
+- Authenticated start-page resolution merges the public catalog with safe
+  metadata from the owner's private library; the same bundle tool handles both
+  visibility classes and decrypts custom source in the browser.
 - Typed public adapter manifest and deterministic route/intent matcher.
 - Version-pinned inline bundles with SHA-256 integrity metadata.
 - `raising-fi.public.funding@1.0.0` with exact-origin enforcement, top-level
@@ -32,7 +35,7 @@ Last updated: 2026-09-03
 - Private-workspace code with Netlify Identity, owner-scoped Blobs storage,
   fixed-recipient declarative LinkedIn tools, and authenticated activation
   pages. Identity and the default GitHub provider are enabled in production.
-- Fifty automated tests plus production build validation.
+- Fifty-eight automated tests plus production build validation.
 
 ## Verified in ChatGPT's integrated browser
 

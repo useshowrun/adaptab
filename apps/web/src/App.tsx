@@ -9,6 +9,7 @@ type AdapterSummary = {
   product: string;
   tools: Array<{ name: string; readOnly: boolean }>;
 };
+type PrivateConnection = "loading" | "signed_out" | { tools: number };
 
 export default function App() {
   return location.pathname === "/workspace" || location.pathname.startsWith("/tools/") ? <Workspace /> : <PublicCatalog />;
@@ -17,6 +18,7 @@ export default function App() {
 function PublicCatalog() {
   const [state, setState] = useState<BootstrapState>("loading");
   const [adapters, setAdapters] = useState<AdapterSummary[]>([]);
+  const [privateConnection, setPrivateConnection] = useState<PrivateConnection>("loading");
 
   useEffect(() => {
     registerBootstrapTools().then(setState).catch(() => setState("error"));
@@ -30,15 +32,38 @@ function PublicCatalog() {
       })
       .then((body) => setAdapters(Array.isArray(body.adapters) ? body.adapters : []))
       .catch(() => setAdapters([]));
+    fetch("/api/private-tools", {
+      cache: "no-store",
+      credentials: "same-origin",
+      headers: { accept: "application/json" },
+    })
+      .then(async (response) => {
+        if (response.status === 401) return setPrivateConnection("signed_out");
+        if (!response.ok) throw new Error("Private workspace unavailable");
+        const body = await response.json();
+        const tools = Array.isArray(body.tools)
+          ? body.tools.reduce((total: number, adapter: { tools?: unknown[] }) => total + (Array.isArray(adapter.tools) ? adapter.tools.length : 0), 0)
+          : 0;
+        setPrivateConnection({ tools });
+      })
+      .catch(() => setPrivateConnection("signed_out"));
   }, []);
 
-  const message = {
+  const bootstrapMessage = {
     loading: "Registering bootstrap tools…",
-    registered: "Four bootstrap tools are ready in this tab.",
+    registered: "Bootstrap tools are ready in this tab.",
     already_registered: "Bootstrap tools are already active in this document.",
     unsupported: "This browser does not expose WebMCP to the page.",
     error: "WebMCP was available, but tool registration failed.",
   }[state];
+  const privateMessage = privateConnection === "loading"
+    ? " Checking your private library…"
+    : privateConnection === "signed_out"
+      ? " Public catalog active; sign in to include private tools."
+      : ` ${privateConnection.tools} private ${privateConnection.tools === 1 ? "tool" : "tools"} connected.`;
+  const message = state === "registered" || state === "already_registered"
+    ? bootstrapMessage + privateMessage
+    : bootstrapMessage;
 
   return (
     <main>
@@ -46,7 +71,11 @@ function PublicCatalog() {
       <section className="hero">
         <p className="eyebrow">OPEN ADAPTER CATALOG</p>
         <h1>WebMCP for<br /><em>every tab.</em></h1>
-        <p className="lede">Give an agent one starting page. AdapTab resolves a reviewed adapter and equips the site you already opened—using your live browser session, without exporting credentials.</p>
+        <p className="lede">Give an agent one starting page. AdapTab resolves the smallest matching adapter from the public catalog and your signed-in private library—using your live browser session, without exporting credentials.</p>
+        <div className="starter-prompt">
+          <b>ONE-LINE START</b>
+          <p>Tell your agent: <q>Open adaptab.netlify.app/start and use AdapTab for my other open tab.</q></p>
+        </div>
         <div className={`status status-${state}`}><span aria-hidden="true" />{message}</div>
       </section>
       <section className="flow" aria-label="How AdapTab works">

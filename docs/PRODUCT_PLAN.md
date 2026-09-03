@@ -74,6 +74,13 @@ separate Showrun skill for each website. A remote MCP server may later expose
 the same catalog independently of a page, but it is not required for the MVP
 and does not by itself solve authenticated cross-origin execution.
 
+When the start-page request carries a valid AdapTab session,
+`adaptab_resolve` merges route-matched public adapters with safe metadata for
+the owner's private adapters. `adaptab_get_bundle` is likewise shared: it
+returns public source or performs an owner check before returning a private
+bundle. Encrypted custom source is materialized only by the start page using
+the key stored in that browser profile. Signed-out use remains public-only.
+
 ## Bootstrap WebMCP tools on the AdapTab page
 
 ### `adaptab_resolve`
@@ -371,21 +378,24 @@ Next progression:
    code.
 8. Team workspaces and roles.
 
-The current private activation flow is:
+The current private creation and activation flow is:
 
 ```text
 signed-in /workspace
 -> create a reviewed template configuration OR preview a custom manifest
 -> encrypt custom source and retain its key in the browser
 -> persist under an owner-scoped key
--> open opaque /tools/<id> locator
--> authenticate and owner-check every info/bundle request
+-> open /start for the normal unified flow, or opaque /tools/<id> as a direct locator
+-> merge only safe private metadata during authenticated resolution
+-> authenticate and owner-check every private bundle request
 -> return reviewed source OR owner ciphertext with private, no-store caching
--> decrypt custom source in the signed-in browser
+-> decrypt custom source in the same browser profile
 -> trusted browser bridge verifies and injects into the declared target page
 ```
 
 Private configuration is not part of the repository or public catalog. The
+unified resolver never exposes recipient configuration or source, and an
+opaque private identifier is not authorization. The
 first template accepts one to three LinkedIn profile URLs and generates a
 preview plus separately confirmed batch send. Custom imports are a separate,
 explicitly unreviewed path: the workspace previews their exact origins, paths,
