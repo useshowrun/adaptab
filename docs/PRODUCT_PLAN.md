@@ -66,12 +66,19 @@ Authenticated target document
 
 The first-run prompt should be approximately:
 
-> Open adaptab.netlify.app/start and use AdapTab for all relevant open tabs.
+> Open adaptab.netlify.app/start in a hidden integrated-browser tab, keep it
+> open, and use AdapTab for all relevant open tabs.
 
 This gives the agent a single bootstrap surface. The agent does not need a
 separate Showrun skill for each website. A remote MCP server may later expose
 the same catalog independently of a page, but it is not required for the MVP
 and does not by itself solve authenticated cross-origin execution.
+
+The integrated browser can load this surface as a hidden background tab, so
+the agent does not need to interrupt the user's visible tab. The document must
+remain alive because WebMCP registration is document-bound. This is different
+from a page-free remote MCP server, and the bootstrap page still cannot inject
+another origin by itself.
 
 The plural prompt is an agent policy, not a bulk-injection primitive. The agent
 enumerates relevant tabs, resolves each URL and task independently, and equips

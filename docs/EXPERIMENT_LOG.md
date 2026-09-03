@@ -205,6 +205,19 @@ cross-origin trust boundary: the hosted page provided the owner-authorized
 bundle, while the approved integrated-browser CDP capability performed the
 target-tab injection.
 
+## Hidden bootstrap-tab test
+
+The production start page was opened in ChatGPT's integrated browser with the
+tab configured as hidden. The browser discovered all four bootstrap WebMCP
+tools, and `adaptab_resolve` successfully selected
+`raising-fi.public.funding@1.1.0` without showing or focusing the AdapTab tab.
+
+This verifies that onboarding does not require a foreground visit. It is still
+a live background document, not a page-free or service-worker MCP surface. The
+tab must remain open for its page-registered tools to stay callable. A future
+remote MCP server could expose catalog tools without a page, but a trusted
+browser bridge would still be required to inject a target origin.
+
 ## GitHub public adapter test
 
 Both the local and deployed AdapTab catalogs resolved

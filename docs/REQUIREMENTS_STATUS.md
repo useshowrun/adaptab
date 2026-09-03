@@ -103,6 +103,9 @@ should stay in the browser.
 Shipped:
 
 - One bootstrap URL replaces per-site agent-skill installation.
+- ChatGPT's integrated browser can load that URL in a hidden tab, discover all
+  four bootstrap tools, and invoke the resolver without foreground navigation.
+  The hidden document must remain open because its WebMCP tools are page-bound.
 - `adaptab_resolve` returns only the smallest matching adapter metadata and,
   when signed in, considers both public and owner-private adapters.
 - Source is fetched only after resolution through `adaptab_get_bundle`.

@@ -39,12 +39,18 @@ Open the [live AdapTab start page](https://adaptab.netlify.app/start) and one
 supported target page in ChatGPT's in-app browser. Enable full CDP access for
 the target only when ChatGPT requests it, then ask:
 
-> Open adaptab.netlify.app/start and use AdapTab for all relevant open tabs.
+> Open adaptab.netlify.app/start in a hidden integrated-browser tab, keep it
+> open, and use AdapTab for all relevant open tabs.
 
 The bootstrap tools provide the precise resolve, verify, inject, and rediscover
 instructions to the agent. When the user is signed in, the same resolver
 searches both the reviewed public catalog and that owner's private library;
 private source remains lazy, owner-checked, and `no-store`.
+
+The bootstrap tab does not need to be visible. ChatGPT's integrated browser
+can keep it as a hidden background document while its four WebMCP tools remain
+discoverable. This avoids a foreground navigation, but it is not page-free:
+closing or replacing that document removes its page-registered tools.
 
 “All relevant” is deliberate: the agent processes open tabs individually and
 activates only those with a route- and intent-compatible adapter. Each browser
