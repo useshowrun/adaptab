@@ -108,7 +108,7 @@ Shipped:
 - One browser-neutral bootstrap URL replaces per-site agent-skill installation.
 - The agent page registers tools without loading the React catalog UI or
   fetching catalog/workspace summaries. Its initial production build payload
-  is about 4.4 kB compressed, before lazy authentication code is needed.
+  is about 4.5 kB compressed, before lazy authentication code is needed.
 - ChatGPT's integrated browser can load a bootstrap document in a hidden tab,
   discover all four tools, and invoke the resolver without foreground
   navigation. The document must remain open because WebMCP is page-bound.

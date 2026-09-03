@@ -223,7 +223,7 @@ human-facing `/start` page emitted a browser notification that WebMCP tools
 were no longer available. The agent-only `/bootstrap` page, loaded in a hidden
 integrated-browser tab, exposed all four bootstrap tools and successfully
 resolved `raising-fi.public.funding@1.1.0`. Its initial HTML and JavaScript
-payload is about 4.4 kB compressed; the authentication module is lazy-loaded
+payload is about 4.5 kB compressed; the authentication module is lazy-loaded
 only when a tool is invoked.
 
 ## GitHub public adapter test
