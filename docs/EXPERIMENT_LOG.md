@@ -231,6 +231,17 @@ the identical four tools as a human-facing fallback, while `/bootstrap` stays
 the preferred lightweight activation surface. Registration on either document
 uses the same implementation and does not change the cross-origin trust model.
 
+## Agent execution-guidance test
+
+The deployed resolver was called for a LinkedIn profile messaging intent from
+a fresh bootstrap document. Its activation result returned
+`additionalTabsRequired: false`, `resourceUrls: "tool_inputs"`,
+`profileResolution: "same_origin_network_requests"`, and
+`tabStrategy: "reuse_resolved_top_level_tab"`. The accompanying prose told the
+agent to reuse one signed-in LinkedIn tab and not open or navigate to a tab for
+each recipient. This guidance changes orchestration only; it adds no recipient
+count restriction.
+
 ## GitHub public adapter test
 
 Both the local and deployed AdapTab catalogs resolved
