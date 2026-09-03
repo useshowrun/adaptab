@@ -66,6 +66,13 @@ The MVP ships six route- and intent-filtered adapters:
   recipient preview followed by a batch-specific confirmation and sequential,
   at-most-once send attempts.
 
+The repository also contains a private-workspace MVP at `/workspace`. A
+signed-in user can create an owner-only, fixed-recipient LinkedIn messaging
+adapter from reviewed template code. Private configurations are stored
+separately, excluded from `/api/catalog`, and delivered only after a server-side
+owner check. An opaque `/tools/<id>` URL locates the tool but never authorizes
+access by itself.
+
 From a clean target tab, the tested flow is:
 
 1. Call `adaptab_resolve` on the AdapTab start page.
@@ -94,6 +101,10 @@ registers four bootstrap tools:
 `npm run check` runs strict TypeScript checks, adapter/unit tests, and the
 production build.
 
+Private Identity flows require Netlify's runtime. Enable Netlify Identity and
+use `netlify dev` rather than the Vite-only command when testing authentication
+locally.
+
 ## Security model
 
 - Exact target origins are checked during resolution, installation, and tool
@@ -110,6 +121,9 @@ production build.
 - Search outreach is limited to three visible People results, requires a full
   preview plus batch-specific confirmation, permits one attempted batch per
   document, and stops after ambiguity.
+- Private tool creation accepts declarative configuration only—never arbitrary
+  JavaScript. Every private read and bundle delivery is scoped to the current
+  Netlify Identity user and returned with no-store caching.
 
 AdapTab does not grant permission to automate a website. Adapter authors and
 users must comply with the target service's terms, applicable law, and their

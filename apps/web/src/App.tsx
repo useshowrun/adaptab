@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { registerBootstrapTools } from "./register-bootstrap";
+import Workspace from "./Workspace";
 
 type BootstrapState = "loading" | "registered" | "already_registered" | "unsupported" | "error";
 type AdapterSummary = {
@@ -10,6 +11,10 @@ type AdapterSummary = {
 };
 
 export default function App() {
+  return location.pathname === "/workspace" || location.pathname.startsWith("/tools/") ? <Workspace /> : <PublicCatalog />;
+}
+
+function PublicCatalog() {
   const [state, setState] = useState<BootstrapState>("loading");
   const [adapters, setAdapters] = useState<AdapterSummary[]>([]);
 
@@ -37,7 +42,7 @@ export default function App() {
 
   return (
     <main>
-      <nav><a className="wordmark" href="/start">AdapTab</a><a href="https://github.com/useshowrun/showrun">Prior art: Showrun</a></nav>
+      <nav><a className="wordmark" href="/start">AdapTab</a><div className="nav-actions"><a href="/workspace">Private workspace</a><a href="https://github.com/useshowrun/showrun">Prior art: Showrun</a></div></nav>
       <section className="hero">
         <p className="eyebrow">OPEN ADAPTER CATALOG</p>
         <h1>WebMCP for<br /><em>every tab.</em></h1>

@@ -104,8 +104,7 @@ The implemented adapter therefore uses the user's already-open, already-
 filtered result page as its search step, selects at most three visible primary
 links, and resolves each exact profile through the page session before
 creating a preview. Automated tests verify the batch-specific confirmation,
-sequential send order, at-most-once lock, and stop-on-ambiguity behavior. No
-live messages were sent during this probe.
+sequential send order, at-most-once lock, and stop-on-ambiguity behavior.
 
 After deployment, the production catalog resolved
 `linkedin.messaging.search-outreach@1.0.0` for that exact People-search route
@@ -114,7 +113,33 @@ installed it, and native WebMCP discovered only its preview and confirmed-send
 tools. A preview with limit two independently resolved the first two visible
 primary profiles, returned their names/URLs and an exact shared-message
 preview, plus a batch-specific confirmation code, with `sent: false`. The send
-tool was intentionally not called.
+tool was not called during that first preview probe.
+
+With a later exact user authorization, a fresh two-recipient preview was
+created for Eyüp Ülker and Mahmut Karaca using harmless test text the user
+approved. The first invocation was stopped by the integrated browser's safety
+layer before LinkedIn delivery; inbox inspection confirmed no message had
+appeared. After the user explicitly authorized a retry, a fresh batch was
+prepared and the confirmed tool reported `sent` for both sequential requests.
+LinkedIn's messaging UI showed both delivered test messages. This also showed
+that an agent-host safety policy can reject a write even when the page and
+target endpoint would permit it.
+
+## Private workspace implementation probe
+
+The first private adapter slice is implemented and covered by automated tests:
+
+- unauthenticated private-list access returns 401;
+- a different signed-in owner receives 404 for another owner's opaque tool ID;
+- approved LinkedIn profile origins are canonicalized and lookalikes rejected;
+- arbitrary JavaScript is not accepted—only a label and one to three URLs;
+- generated bundles are private, integrity-addressed, and returned with
+  `private, no-store` caching;
+- the public catalog filters on `visibility: public` explicitly; and
+- the agent-facing page registers only private info and bundle bootstrap tools.
+
+The production Identity configuration, stored-record round trip, and injected
+private bundle remain to be verified in a real browser.
 
 ## GitHub public adapter test
 
@@ -165,9 +190,7 @@ bounded metadata.
 - Automatic reinjection by a long-running local supervisor.
 - Full browser restart and recovery.
 - A production Chrome extension.
-- Private adapter authentication and storage.
+- Production private adapter authentication and storage round trip.
 - Signed bundle verification end to end.
 - Native-site-tool conflict detection.
 - Sales Navigator or Recruiter adapters.
-- Live send of the guarded People-search composition; this requires a fresh,
-  exact recipient/message authorization and is not needed to validate preview.

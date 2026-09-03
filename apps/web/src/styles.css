@@ -6,6 +6,8 @@ body { margin: 0; min-width: 320px; min-height: 100vh; background: radial-gradie
 a { color: inherit; text-decoration: none; }
 main { min-height: 100vh; padding: 0 5vw; }
 nav { height: 84px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #18211b33; font: 500 12px DM Mono, monospace; text-transform: uppercase; letter-spacing: .08em; }
+.nav-actions { display: flex; align-items: center; gap: 24px; }
+.nav-actions button { border: 0; padding: 0; background: transparent; font: inherit; text-transform: inherit; letter-spacing: inherit; cursor: pointer; }
 .wordmark { font: 700 23px Manrope, sans-serif; text-transform: none; letter-spacing: -.06em; }
 .wordmark::after { content: '↗'; color: #6a00ff; margin-left: 5px; font: 500 14px DM Mono; }
 .hero { max-width: 1060px; padding: 11vh 0 9vh; }
@@ -36,4 +38,32 @@ h1 em { color: #6a00ff; font-style: normal; }
 .adapter-list code { color: #18211b; background: #d7ff4f; padding: 10px; }
 .catalog-loading { padding: 34px 0; }
 footer { padding: 22px 0 32px; border-top: 1px solid #18211b33; display: flex; justify-content: space-between; font: 400 10px DM Mono, monospace; text-transform: uppercase; }
+.workspace { padding-bottom: 70px; }
+.workspace-loading { padding: 15vh 0; font: 500 12px DM Mono, monospace; }
+.workspace-header { display: flex; align-items: end; justify-content: space-between; gap: 30px; padding: 8vh 0 5vh; }
+.workspace-header h1 { margin: 12px 0 0; font-size: clamp(52px, 8vw, 108px); }
+.workspace-header > p { font: 500 11px DM Mono, monospace; }
+.workspace-grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 24px; }
+.workspace-card { max-width: 1050px; border: 1px solid #18211b; background: #fafbf5cc; padding: clamp(28px, 5vw, 60px); }
+.auth-card { margin: 7vh auto 0; max-width: 760px; }
+.workspace-card h1 { font-size: clamp(50px, 8vw, 92px); }
+.workspace-card h2 { margin: 10px 0 12px; font-size: 34px; letter-spacing: -.04em; }
+.workspace-card h3 { margin-top: 35px; }
+.workspace-card p, .workspace-card li { color: #59635b; line-height: 1.55; }
+.workspace-card label { display: grid; gap: 7px; margin: 18px 0; font: 500 11px DM Mono, monospace; text-transform: uppercase; letter-spacing: .06em; }
+.workspace-card input, .workspace-card textarea { width: 100%; border: 1px solid #18211b66; border-radius: 0; background: white; padding: 13px; color: #18211b; font: 400 14px Manrope, sans-serif; }
+.workspace-card button { border: 1px solid #18211b; background: transparent; padding: 12px 16px; cursor: pointer; font: 500 11px DM Mono, monospace; text-transform: uppercase; }
+.workspace-card button:disabled { cursor: not-allowed; opacity: .45; }
+.workspace-card .primary-button { background: #6a00ff; color: white; border-color: #6a00ff; }
+.button-row { display: flex; gap: 10px; }
+.auth-divider { margin: 26px 0 10px; border-top: 1px solid #18211b33; text-align: center; }
+.auth-divider span { position: relative; top: -8px; background: #fafbf5; padding: 0 9px; font: 500 10px DM Mono, monospace; text-transform: uppercase; }
+.form-error { color: #b53c22 !important; }
+.form-message { color: #315f39 !important; }
+.private-badge { display: inline-block; border: 1px solid #6a00ff; color: #6a00ff; padding: 7px 9px; font: 500 10px DM Mono, monospace; letter-spacing: .08em; }
+.private-list { margin-top: 24px; border-top: 1px solid #18211b; }
+.private-list a { display: grid; gap: 6px; padding: 18px 0; border-bottom: 1px solid #18211b55; }
+.private-list span { color: #59635b; font: 400 10px DM Mono, monospace; }
+.notice { margin-top: 28px; padding: 16px; background: #d7ff4f55; font-size: 14px; line-height: 1.5; }
 @media (max-width: 720px) { .flow { grid-template-columns: 1fr; } .flow article + article { border-left: 0; border-top: 1px solid #18211b; padding-left: 0; } .catalog-heading { align-items: start; flex-direction: column; } .adapter-list article { grid-template-columns: 34px 1fr; padding: 24px 0; } .adapter-list span, .adapter-list code { grid-column: 2; justify-self: start; } nav > a:last-child { display: none; } }
+@media (max-width: 720px) { .workspace-grid { grid-template-columns: 1fr; } .workspace-header { align-items: start; flex-direction: column; } .nav-actions a:last-child { display: none; } }

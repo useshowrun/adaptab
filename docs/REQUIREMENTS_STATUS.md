@@ -28,9 +28,10 @@ adds evidence.
   native target-page tool discovery, and live invocation.
 - Six reviewed adapters are implemented across Raising.fi, GitHub, Hacker
   News, and three LinkedIn product groups.
-- Thirty-four automated tests and repeated integrated-browser tests pass.
-- Of the eight original product requirement groups: one is MVP complete, five
-  are partial, and two are designed or deferred.
+- Forty-two automated tests and repeated integrated-browser tests pass.
+- Of the eight original product requirement groups: one is MVP complete and
+  seven are partial; the private-workspace requirement now has a tested narrow
+  implementation rather than only a design.
 - Against the ten MVP success criteria in `PRODUCT_PLAN.md`, eight are complete
   and two are partial: the durable no-match path still needs a production
   persistence test, and the submission demo video is not yet recorded.
@@ -174,28 +175,38 @@ Next acceptance milestone:
 **Original intent:** Users should be able to add tools that AdapTab or the site
 does not provide, including private internal workflows.
 
-**Status: Designed.**
+**Status: Partial; first private template is code complete.**
 
-Shipped foundation:
+Shipped:
 
 - Manifest types reserve `public` and `private` visibility.
-- Public adapters already use the schema and safety model private adapters
-  would build upon.
+- `/workspace` provides Netlify Identity sign-in and an owner-specific tool
+  list and creator.
+- Users can create a declarative fixed-recipient LinkedIn messaging tool with
+  one to three validated profile URLs; arbitrary JavaScript is rejected.
+- `/tools/<opaque-id>` exposes authenticated private info and bundle WebMCP
+  tools for easy agent activation.
+- Every private Function performs an owner-scoped lookup, returns 404 across
+  owners, and uses `private, no-store` delivery.
+- Private adapters are explicitly excluded from public resolve, bundle, and
+  catalog paths.
 
 Missing:
 
-- Local adapter import, schema validation, preview, and installation UI.
-- User identity, private catalog APIs, authorization checks, encryption, key
-  management, and deletion/export controls.
+- Production Identity enablement and a real-browser stored-record/injection
+  test.
+- General local adapter import, permission preview, and additional templates.
+- Encryption/key management, deletion/export/revocation, quotas, and audit
+  controls.
 - Isolation and review rules for untrusted user-authored code.
 - A way to supplement a site that already has native WebMCP without shadowing
   its tools.
 
 Next acceptance milestone:
 
-- Implement local-only private adapter import first. Validate the manifest,
-  display requested origins/network access/side effects, and require approval
-  before current-document injection. Do not add cloud storage first.
+- Enable Identity, create the intended two-colleague private group in
+  production, verify cross-owner isolation, and inject/call its preview tool.
+  Add deletion/export before expanding beyond reviewed templates.
 
 ### R6. Multi-step and composed tools
 
@@ -238,24 +249,26 @@ Next acceptance milestone:
 **Original intent:** Store personal/internal adapters privately and eventually
 share them with a team.
 
-**Status: Designed and deferred.**
+**Status: Partial; authenticated single-user foundation is code complete.**
 
-Shipped foundation:
+Shipped:
 
-- Public/private visibility exists in the data model.
-- Netlify Functions and Blobs are already used for non-secret bounded events.
+- Netlify Identity integration and authenticated `/workspace` UI.
+- Owner-scoped private-tool keys in a dedicated Netlify Blobs store.
+- Server-side owner checks on list, detail, and bundle delivery.
+- Opaque tool URLs that are intentionally not bearer credentials.
 
 Missing:
 
-- Accounts, organizations, membership, roles, invitations, encrypted private
-  artifacts, audit logs, secret handling, sharing controls, revocation, and
-  tenant isolation.
+- Production Identity enablement and isolation verification.
+- Organizations, membership, roles, invitations, encrypted private artifacts,
+  audit logs, secret handling, sharing controls, revocation, and formal tenant
+  isolation review.
 
 Next acceptance milestone:
 
-- After local-only private imports work, add authenticated single-user storage
-  with authorization-checked functions. Team sharing comes after isolation and
-  audit tests.
+- Verify the single-user production path and add deletion/export/audit basics.
+  Team sharing comes only after isolation and audit tests.
 
 ### R8. Privacy-minimized telemetry and future site-owner analytics
 
@@ -296,7 +309,7 @@ Next acceptance milestone:
 | `raising-fi.public.funding@1.0.0` | MVP complete | Public resolve, inject, invoke, reload, reinject |
 | `linkedin.core.company-search@1.0.0` | MVP complete | Authenticated company searches; credentials stayed in page |
 | `linkedin.messaging.send-message@1.0.0` | MVP complete | Exact recipient preview and two separately authorized production sends |
-| `linkedin.messaging.search-outreach@1.0.0` | Code complete | Production resolve/hash/inject/preview verified with two exact recipients; no live sends |
+| `linkedin.messaging.search-outreach@1.0.0` | MVP complete | Production resolve/hash/inject/preview and authorized two-recipient send verified |
 | `github.public.user-research@1.0.0` | MVP complete | Three public tools invoked from production bundle |
 | `hacker-news.public.front-page@1.0.0` | MVP complete | CSP-safe, network-free production invocation |
 
@@ -315,11 +328,12 @@ Next acceptance milestone:
 2. Verify the no-match queue and consented telemetry persistence in production.
 3. Add a trusted local lifecycle supervisor with out-of-context bundle fetch,
    hash verification, and document reinjection.
-4. Add local-only custom/private adapter import with permission preview.
+4. Enable and verify the private workspace in production, then add
+   deletion/export and permission preview.
 
 ### Later platform milestones
 
-1. Authenticated private storage, then team workspaces and audit controls.
+1. Expand reviewed private templates, then team workspaces and audit controls.
 2. Read-only composition engine, followed by narrowly guarded writes.
 3. Verified-site-owner, thresholded analytics.
 4. Extension delivery only where a trusted CDP host is unavailable or

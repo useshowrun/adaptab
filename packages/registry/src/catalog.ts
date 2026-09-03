@@ -36,7 +36,7 @@ export function sha256(source: string): string {
 }
 
 export function getBundle(adapterId: string, version: string): BundleRecord | undefined {
-  return bundles.find(({ manifest }) => manifest.id === adapterId && manifest.version === version);
+  return bundles.find(({ manifest }) => manifest.visibility === "public" && manifest.id === adapterId && manifest.version === version);
 }
 
 export function resolveAdapter(input: ResolveInput) {
@@ -55,7 +55,7 @@ export function resolveAdapter(input: ResolveInput) {
   }
 
   const siteCandidates = bundles.filter(({ manifest }) =>
-    manifest.origins.includes(target.origin) &&
+    manifest.visibility === "public" && manifest.origins.includes(target.origin) &&
     manifest.pathPatterns.some((pattern) => normalizePathPattern(pattern).test(target.pathname)),
   );
 
@@ -118,7 +118,7 @@ export function resolveAdapter(input: ResolveInput) {
 }
 
 export function listPublicAdapters() {
-  return bundles.map(({ manifest, source }) => ({
+  return bundles.filter(({ manifest }) => manifest.visibility === "public").map(({ manifest, source }) => ({
     ...manifest,
     integrity: { algorithm: "sha256", value: sha256(source) },
   }));

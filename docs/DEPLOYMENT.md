@@ -29,3 +29,21 @@ bundle, inject, discovery, and invocation sequence recorded in
 
 Netlify's runtime supplies the Blobs configuration to Functions automatically.
 No target-site cookie or token belongs in Netlify settings.
+
+## Enable the private workspace
+
+The public catalog works without Identity. To activate `/workspace`:
+
+1. In the Netlify project, enable Netlify Identity.
+2. Keep registration invite-only for a private demo, or open registration only
+   while creating intended test accounts.
+3. Enable GitHub under external OAuth providers if the **Continue with GitHub**
+   button should be used. Email/password remains available.
+4. Open `/workspace`, sign in, and create a fixed-recipient tool with one to
+   three complete LinkedIn `/in/` URLs.
+5. Open the returned `/tools/<opaque-id>` page while signed in. Confirm that
+   `adaptab_private_tool_info` and `adaptab_get_private_bundle` are discoverable.
+
+The opaque URL is a locator, not a bearer token. Private Functions always read
+the Identity session and scope the Netlify Blobs key to that owner. Do not place
+access tokens in query strings.

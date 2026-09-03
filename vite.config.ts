@@ -7,6 +7,9 @@ import catalog from "./netlify/functions/catalog.mts";
 import reportResult from "./netlify/functions/report-result.mts";
 import requestAdapter from "./netlify/functions/request-adapter.mts";
 import resolve from "./netlify/functions/resolve.mts";
+import privateTools from "./netlify/functions/private-tools.mts";
+import privateTool from "./netlify/functions/private-tool.mts";
+import privateBundle from "./netlify/functions/private-bundle.mts";
 
 type FunctionHandler = (request: Request) => Promise<Response>;
 
@@ -17,6 +20,9 @@ function localFunctionBridge(): Plugin {
     "/api/report-result": reportResult,
     "/api/request-adapter": requestAdapter,
     "/api/resolve": resolve,
+    "/api/private-tools": privateTools,
+    "/api/private-tool": privateTool,
+    "/api/private-bundle": privateBundle,
   };
 
   return {

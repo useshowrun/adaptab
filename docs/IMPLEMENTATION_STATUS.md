@@ -29,7 +29,10 @@ Last updated: 2026-09-03
   and opt-in telemetry.
 - Netlify Blobs append-only storage for sanitized requests and telemetry,
   namespaced by deployment context.
-- Thirty-four automated tests plus production build validation.
+- Private-workspace code with Netlify Identity, owner-scoped Blobs storage,
+  fixed-recipient declarative LinkedIn tools, and authenticated activation
+  pages. Production Identity enablement and browser verification remain.
+- Forty-two automated tests plus production build validation.
 
 ## Verified in ChatGPT's integrated browser
 
@@ -58,8 +61,8 @@ bundle hash matched the value returned by resolve, and it was installed into a
 fresh authenticated LinkedIn document. Native WebMCP discovery exposed the
 separate prepare and confirmed-send tools. Its send, duplicate-send,
 ambiguous-outcome, expiry boundary, origin guard, and recipient-validation
-behavior are covered by mocks. No real message was sent during this
-implementation pass.
+behavior are covered by mocks. Separately authorized production sends were
+successfully reported by LinkedIn.
 
 The GitHub and Hacker News adapters were each resolved from the public Netlify
 catalog, hash-matched, installed into clean target documents, rediscovered as
@@ -69,8 +72,9 @@ The current LinkedIn People-search markup was inspected in a live signed-in
 tab and supports the adapter's primary-result boundary. The deployed catalog
 resolved the adapter, its bundle hash matched, CDP installed it, native WebMCP
 discovered its two tools, and a limit-two preview resolved the first two exact
-visible recipients with `sent: false`. No live sends were authorized or made
-by that test.
+visible recipients with `sent: false`. After a fresh explicit authorization,
+the same two-recipient group was prepared again and both sequential sends
+returned `sent`; inbox inspection showed both test messages.
 
 This verifies the no-extension MVP path. It still requires a client with an
 approved page-injection capability such as full CDP access.
@@ -78,5 +82,7 @@ approved page-injection capability such as full CDP access.
 ## Next
 
 1. Record the sub-three-minute demo and complete the Devpost submission.
-2. Add a guided adapter-authoring workflow using the existing manifests as
+2. Enable Netlify Identity and verify private creation, owner isolation,
+   private bootstrap discovery, and bundle injection in production.
+3. Add a guided adapter-authoring workflow using the existing manifests as
    examples and Showrun only as prior-art reference material.

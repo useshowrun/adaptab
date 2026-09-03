@@ -351,13 +351,37 @@ timeouts, bounded outputs, and `credentials: "same-origin"` or equivalent.
 The data model should support `public` and `private` visibility from the
 beginning, but full accounts are not required for the first deploy.
 
-Recommended progression:
+Implemented progression:
 
 1. Public reviewed adapters stored in the repository.
-2. Local-only user adapters imported and validated in the browser.
-3. Authenticated private library using Netlify Identity.
-4. Encrypted private artifacts behind authorization-checked Functions.
-5. Team workspaces and roles.
+2. Authenticated single-user library using Netlify Identity and
+   authorization-checked Functions.
+3. Declarative fixed-recipient LinkedIn configurations stored in an
+   owner-scoped Netlify Blobs namespace.
+
+Next progression:
+
+4. Deletion/export/revocation, audit records, quotas, and encryption/key
+   management appropriate to private artifacts.
+5. A sandboxed local-import path for additional reviewed templates.
+6. Team workspaces and roles.
+
+The current private activation flow is:
+
+```text
+signed-in /workspace
+-> validate a fixed-recipient declarative configuration
+-> persist under an owner-scoped key
+-> open opaque /tools/<id> locator
+-> authenticate and owner-check every info/bundle request
+-> return reviewed generated source with private, no-store caching
+-> trusted browser bridge verifies and injects into LinkedIn
+```
+
+Private configuration is not part of the repository or public catalog. The
+first template accepts one to three LinkedIn profile URLs and generates a
+preview plus separately confirmed batch send. It does not accept arbitrary
+JavaScript.
 
 Never execute an unreviewed community submission as a public adapter. Public
 submissions require source review, fixture tests, route matching, risk
@@ -454,6 +478,10 @@ not individual user activity.
 - Tool outputs are bounded and schema-validated.
 - Community requests do not directly become executable production code.
 - Private adapters are never exposed through the public catalog.
+- Opaque private-tool URLs are identifiers, not credentials; every access is
+  authenticated and owner-scoped on the server.
+- User configuration is data consumed by reviewed templates, never executable
+  source accepted from a form.
 
 ## MVP implementation sequence
 
@@ -473,7 +501,7 @@ not individual user activity.
 
 - Chrome extension
 - always-on remote MCP server
-- full private cloud workspace
+- encrypted private artifacts, deletion/export, and audit controls
 - team roles and sharing
 - automatic community publication
 - Sales Navigator and Recruiter implementations
