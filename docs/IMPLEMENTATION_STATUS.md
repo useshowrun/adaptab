@@ -31,8 +31,7 @@ Last updated: 2026-09-03
   namespaced by deployment context.
 - Private-workspace code with Netlify Identity, owner-scoped Blobs storage,
   fixed-recipient declarative LinkedIn tools, and authenticated activation
-  pages. Identity and the default GitHub provider are enabled in production;
-  an authenticated stored-record/browser test remains.
+  pages. Identity and the default GitHub provider are enabled in production.
 - Forty-three automated tests plus production build validation.
 
 ## Verified in ChatGPT's integrated browser
@@ -80,10 +79,18 @@ returned `sent`; inbox inspection showed both test messages.
 This verifies the no-extension MVP path. It still requires a client with an
 approved page-injection capability such as full CDP access.
 
+The production private-workspace path was also verified with an authenticated
+owner and a three-profile fixed-recipient group. The stored configuration was
+returned only through the private activation page, the generated bundle's
+SHA-256 matched locally, and CDP installed it into an authenticated LinkedIn
+top-level document. LinkedIn discovered the generated preview and confirmed-
+send tools through native WebMCP. Neither tool was invoked, so this test made
+no profile-resolution requests and sent no messages.
+
 ## Next
 
 1. Record the sub-three-minute demo and complete the Devpost submission.
-2. Verify private creation, owner isolation, private bootstrap discovery, and
-   bundle injection in production.
+2. Add a second test identity to verify cross-owner 404 behavior in production,
+   then add deletion/export controls.
 3. Add a guided adapter-authoring workflow using the existing manifests as
    examples and Showrun only as prior-art reference material.

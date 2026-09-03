@@ -193,8 +193,9 @@ Shipped:
 
 Missing:
 
-- A real-browser authenticated stored-record/injection test. Production
-  Identity and its default GitHub provider are enabled.
+- Production cross-owner verification with a second account, plus deletion and
+  export controls. The authenticated stored-record and injection path is
+  verified with the primary owner.
 - General local adapter import, permission preview, and additional templates.
 - Encryption/key management, deletion/export/revocation, quotas, and audit
   controls.
@@ -204,9 +205,8 @@ Missing:
 
 Next acceptance milestone:
 
-- Enable Identity, create the intended two-colleague private group in
-  production, verify cross-owner isolation, and inject/call its preview tool.
-  Add deletion/export before expanding beyond reviewed templates.
+- Verify cross-owner isolation with a second production account and add
+  deletion/export before expanding beyond reviewed templates.
 
 ### R6. Multi-step and composed tools
 
@@ -260,16 +260,17 @@ Shipped:
 
 Missing:
 
-- Production authenticated record creation and cross-owner isolation
-  verification. Identity and its default GitHub provider are enabled.
+- Production cross-owner isolation verification with a second account.
+  Identity, GitHub login, owner record creation, authenticated retrieval, and
+  private bundle delivery are verified.
 - Organizations, membership, roles, invitations, encrypted private artifacts,
   audit logs, secret handling, sharing controls, revocation, and formal tenant
   isolation review.
 
 Next acceptance milestone:
 
-- Verify the single-user production path and add deletion/export/audit basics.
-  Team sharing comes only after isolation and audit tests.
+- Add deletion/export/audit basics and verify a second owner is isolated. Team
+  sharing comes only after isolation and audit tests.
 
 ### R8. Privacy-minimized telemetry and future site-owner analytics
 

@@ -138,9 +138,19 @@ The first private adapter slice is implemented and covered by automated tests:
 - the public catalog filters on `visibility: public` explicitly; and
 - the agent-facing page registers only private info and bundle bootstrap tools.
 
-Production Identity and the default GitHub provider are enabled. The
-authenticated stored-record round trip and injected private bundle remain to
-be verified in a real browser.
+Production Identity and the default GitHub provider are enabled. An owner
+signed in with GitHub and created a private three-profile fixed-recipient
+group. The activation page retrieved the exact stored configuration through
+native WebMCP, returned a generated private bundle, and exposed its expected
+LinkedIn origin and two generated tool manifests. A local SHA-256 computation
+matched the returned integrity value.
+
+After exact-origin and top-level checks, CDP installed that bundle into the
+already authenticated LinkedIn document. Native WebMCP rediscovery returned
+the generated read-only preview tool and separately confirmed send tool. The
+test intentionally invoked neither, so it made no recipient-resolution
+requests and sent no messages. Cross-owner 404 behavior is unit-tested but
+still needs a second production identity for live verification.
 
 ## GitHub public adapter test
 
