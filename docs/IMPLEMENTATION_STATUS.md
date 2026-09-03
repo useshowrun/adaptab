@@ -5,7 +5,10 @@ Last updated: 2026-09-03
 ## Working now
 
 - Public production deployment: `https://adaptab.netlify.app/start`.
-- Vite + React start page with imperative top-level WebMCP registration.
+- Human-facing Vite + React catalog at `/start` and a separate, agent-only
+  `/bootstrap` document with imperative top-level WebMCP registration.
+- The bootstrap registration path is roughly 4.4 kB compressed and lazy-loads
+  Netlify Identity only when a tool call needs authenticated API access.
 - Four bootstrap tools: resolve, get bundle, request adapter, and report result.
 - Authenticated start-page resolution merges the public catalog with safe
   metadata from the owner's private library; the same bundle tool handles both

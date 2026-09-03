@@ -5,10 +5,10 @@
 **Live app:** [adaptab.netlify.app/start](https://adaptab.netlify.app/start)
 
 AdapTab is a hosted catalog of reviewed, route-aware browser adapters. An agent
-visits one start page, resolves another open tab to the smallest compatible
-adapter, obtains an immutable installer with an integrity hash, and injects it
-through an approved browser automation channel. The target page then exposes
-the adapter's narrow actions as native WebMCP tools.
+loads one lightweight bootstrap page, resolves another open tab to the smallest
+compatible adapter, obtains an immutable installer with an integrity hash, and
+injects it through an approved browser automation channel. The target page then
+exposes the adapter's narrow actions as native WebMCP tools.
 
 The hosted service never receives browser cookies or acts as a proxy for the
 third-party website. Adapter tools execute inside the matching top-level page
@@ -23,7 +23,7 @@ origin, route, intent, and client support, and invoked through WebMCP's normal
 browser review flow.
 
 ```text
-AdapTab catalog page
+AdapTab agent bootstrap
   → resolve origin + route + intent
   → return reviewed versioned adapter
 Trusted browser bridge
@@ -35,22 +35,22 @@ Target document
 
 ## Judge quickstart
 
-Open the [live AdapTab start page](https://adaptab.netlify.app/start) and one
-supported target page in ChatGPT's in-app browser. Enable full CDP access for
-the target only when ChatGPT requests it, then ask:
+Open one supported target page. Enable browser injection for the target only
+when the agent host requests it, then ask:
 
-> Open adaptab.netlify.app/start in a hidden integrated-browser tab, keep it
-> open, and use AdapTab for all relevant open tabs.
+> Use https://adaptab.netlify.app/bootstrap as AdapTab's agent bootstrap. Keep
+> it available while using AdapTab for all relevant open tabs.
 
 The bootstrap tools provide the precise resolve, verify, inject, and rediscover
 instructions to the agent. When the user is signed in, the same resolver
 searches both the reviewed public catalog and that owner's private library;
 private source remains lazy, owner-checked, and `no-store`.
 
-The bootstrap tab does not need to be visible. ChatGPT's integrated browser
-can keep it as a hidden background document while its four WebMCP tools remain
-discoverable. This avoids a foreground navigation, but it is not page-free:
-closing or replacing that document removes its page-registered tools.
+`/bootstrap` is separate from the human-facing
+[`/start`](https://adaptab.netlify.app/start) catalog. It loads no React UI,
+catalog list, or workspace status before registering its four tools. A capable
+agent may keep it in a background or hidden browsing context, but it is not
+page-free: closing or replacing that document removes its registered tools.
 
 “All relevant” is deliberate: the agent processes open tabs individually and
 activates only those with a route- and intent-compatible adapter. Each browser
@@ -95,7 +95,7 @@ by itself.
 
 From a clean target tab, the tested flow is:
 
-1. Call `adaptab_resolve` on the AdapTab start page.
+1. Call `adaptab_resolve` on the AdapTab bootstrap page.
 2. Call `adaptab_get_bundle` for the exact returned version.
 3. Verify its SHA-256 and expected origin.
 4. Evaluate the installer in the Raising.fi top-level document using approved
@@ -110,8 +110,8 @@ npm run check
 npm run dev
 ```
 
-Open `http://127.0.0.1:5173/start`. In a browser with WebMCP enabled, the page
-registers four bootstrap tools:
+Open `http://127.0.0.1:5173/bootstrap.html`. In a browser with WebMCP enabled,
+the lightweight agent page registers four bootstrap tools:
 
 - `adaptab_resolve`
 - `adaptab_get_bundle`

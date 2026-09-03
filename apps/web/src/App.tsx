@@ -12,7 +12,7 @@ type AdapterSummary = {
 };
 type PrivateConnection = "loading" | "signed_out" | { adapters: number };
 
-const starterPrompt = "Open adaptab.netlify.app/start in a hidden integrated-browser tab, keep it open, and use AdapTab for all relevant open tabs.";
+const starterPrompt = "Use https://adaptab.netlify.app/bootstrap as AdapTab's agent bootstrap. Keep it available while using AdapTab for all relevant open tabs.";
 
 export default function App() {
   return location.pathname === "/workspace" || location.pathname.startsWith("/tools/") ? <Workspace /> : <PublicCatalog />;

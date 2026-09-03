@@ -1,6 +1,5 @@
-import { getUser, refreshSession } from "@netlify/identity";
-
 export async function authenticatedFetch(input: RequestInfo | URL, init: RequestInit = {}) {
+  const { getUser, refreshSession } = await import("@netlify/identity");
   const user = await getUser();
   if (user) await refreshSession();
   return fetch(input, { ...init, credentials: "same-origin" });

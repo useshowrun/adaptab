@@ -48,6 +48,8 @@ one AdapTab link and become ready to work.
 Shipped:
 
 - Public start page: `https://adaptab.netlify.app/start`.
+- Lightweight agent page: `https://adaptab.netlify.app/bootstrap`, separate
+  from the human catalog and workspace interface.
 - Four native bootstrap tools: resolve, get bundle, request adapter, and report
   result.
 - The same authenticated resolver and bundle tools include the owner's private
@@ -102,10 +104,13 @@ should stay in the browser.
 
 Shipped:
 
-- One bootstrap URL replaces per-site agent-skill installation.
-- ChatGPT's integrated browser can load that URL in a hidden tab, discover all
-  four bootstrap tools, and invoke the resolver without foreground navigation.
-  The hidden document must remain open because its WebMCP tools are page-bound.
+- One browser-neutral bootstrap URL replaces per-site agent-skill installation.
+- The agent page registers tools without loading the React catalog UI or
+  fetching catalog/workspace summaries. Its initial production build payload
+  is about 4.4 kB compressed, before lazy authentication code is needed.
+- ChatGPT's integrated browser can load a bootstrap document in a hidden tab,
+  discover all four tools, and invoke the resolver without foreground
+  navigation. The document must remain open because WebMCP is page-bound.
 - `adaptab_resolve` returns only the smallest matching adapter metadata and,
   when signed in, considers both public and owner-private adapters.
 - Source is fetched only after resolution through `adaptab_get_bundle`.
@@ -128,6 +133,8 @@ Missing:
   the tool is absent and performing lazy reinjection.
 - No standalone supervisor, Chrome new-document hook, or extension runtime.
 - No measured activation latency/token benchmark against Showrun.
+- No proof yet that a separate, fully headless browser process can publish its
+  page tools into an arbitrary agent host without a host-specific bridge.
 
 Next acceptance milestone:
 

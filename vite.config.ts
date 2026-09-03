@@ -56,6 +56,12 @@ export default defineConfig({
   build: {
     outDir: "../../dist",
     emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        main: new URL("./apps/web/index.html", import.meta.url).pathname,
+        bootstrap: new URL("./apps/web/bootstrap.html", import.meta.url).pathname,
+      },
+    },
   },
   test: { include: ["tests/**/*.test.ts"] },
 });

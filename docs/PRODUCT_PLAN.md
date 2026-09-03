@@ -62,37 +62,40 @@ Authenticated target document
         -> WebMCP registration and same-origin requests
 ```
 
-## Why a starting URL instead of per-site skill installation
+## Why an agent bootstrap URL instead of per-site skill installation
 
 The first-run prompt should be approximately:
 
-> Open adaptab.netlify.app/start in a hidden integrated-browser tab, keep it
-> open, and use AdapTab for all relevant open tabs.
+> Use https://adaptab.netlify.app/bootstrap as AdapTab's agent bootstrap. Keep
+> it available while using AdapTab for all relevant open tabs.
 
-This gives the agent a single bootstrap surface. The agent does not need a
-separate Showrun skill for each website. A remote MCP server may later expose
-the same catalog independently of a page, but it is not required for the MVP
-and does not by itself solve authenticated cross-origin execution.
+This gives the agent a single, browser-neutral bootstrap surface. The agent
+does not need a separate Showrun skill for each website. A remote MCP server
+may later expose the same catalog independently of a page, but it is not required for
+the MVP and does not by itself solve authenticated cross-origin execution.
 
-The integrated browser can load this surface as a hidden background tab, so
-the agent does not need to interrupt the user's visible tab. The document must
-remain alive because WebMCP registration is document-bound. This is different
-from a page-free remote MCP server, and the bootstrap page still cannot inject
-another origin by itself.
+The human catalog remains at `/start`; `/bootstrap` is an agent-only top-level
+document with no React interface, catalog request, or workspace-status request
+on its registration path. An agent host may keep it in a background, hidden,
+or otherwise non-foreground browsing context. The document must remain alive
+because WebMCP registration is document-bound. This is different from a
+page-free remote MCP server, and the bootstrap page still cannot inject another
+origin by itself.
 
 The plural prompt is an agent policy, not a bulk-injection primitive. The agent
 enumerates relevant tabs, resolves each URL and task independently, and equips
 only compatible top-level documents. Per-origin approval and per-document
 lifecycle rules continue to apply.
 
-When the start-page request carries a valid AdapTab session,
+When the bootstrap document carries a valid AdapTab session,
 `adaptab_resolve` merges route-matched public adapters with safe metadata for
 the owner's private adapters. `adaptab_get_bundle` is likewise shared: it
 returns public source or performs an owner check before returning a private
-bundle. Encrypted custom source is materialized only by the start page using
-the key stored in that browser profile. Signed-out use remains public-only.
+bundle. Encrypted custom source is materialized only by the bootstrap page
+using the key stored in that browser profile. Signed-out use remains
+public-only.
 
-## Bootstrap WebMCP tools on the AdapTab page
+## Bootstrap WebMCP tools on the AdapTab agent page
 
 ### `adaptab_resolve`
 
