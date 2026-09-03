@@ -134,4 +134,6 @@ browser behavior. [docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md)
 records the reproducible MVP results, and [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
 covers Netlify deployment. [docs/SHOWRUN_MIGRATION.md](docs/SHOWRUN_MIGRATION.md)
 tracks prior-art recipes as they are independently converted into reviewed
-AdapTab adapters.
+AdapTab adapters. [docs/REQUIREMENTS_STATUS.md](docs/REQUIREMENTS_STATUS.md)
+is the living ledger for the original requirements, shipped evidence, gaps,
+and next milestones.

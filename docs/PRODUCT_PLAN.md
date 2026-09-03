@@ -3,6 +3,9 @@
 Status: implemented MVP architecture and roadmap
 Last updated: 2026-09-03
 
+Live requirement-by-requirement progress is tracked in
+[`REQUIREMENTS_STATUS.md`](REQUIREMENTS_STATUS.md).
+
 ## Product identity
 
 - Name: **AdapTab**
