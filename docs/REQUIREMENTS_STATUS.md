@@ -28,7 +28,7 @@ adds evidence.
   native target-page tool discovery, and live invocation.
 - Six reviewed adapters are implemented across Raising.fi, GitHub, Hacker
   News, and three LinkedIn product groups.
-- Forty-three automated tests and repeated integrated-browser tests pass.
+- Fifty automated tests and repeated integrated-browser tests pass.
 - Of the eight original product requirement groups: one is MVP complete and
   seven are partial; the private-workspace requirement now has a tested narrow
   implementation rather than only a design.
@@ -175,15 +175,21 @@ Next acceptance milestone:
 **Original intent:** Users should be able to add tools that AdapTab or the site
 does not provide, including private internal workflows.
 
-**Status: Partial; first private template is code complete.**
+**Status: Partial; template and encrypted custom-import paths are code complete.**
 
 Shipped:
 
 - Manifest types reserve `public` and `private` visibility.
-- `/workspace` provides Netlify Identity sign-in and an owner-specific tool
-  list and creator.
+- `/workspace` provides Netlify Identity sign-in and an owner-specific library
+  that lists every individual WebMCP tool within its adapter package.
 - Users can create a declarative fixed-recipient LinkedIn messaging tool with
-  one to three validated profile URLs; arbitrary JavaScript is rejected.
+  one to three validated profile URLs from reviewed template code.
+- Users can import a custom manifest and source for any bounded set of exact
+  HTTPS origins. The UI previews page, declared network, read/write, and
+  confirmation permissions before import.
+- Custom source is wrapped with origin, path, and top-level guards, then
+  AES-GCM encrypted in the browser. Netlify receives owner-scoped ciphertext,
+  metadata, and an integrity hash but no plaintext source or key.
 - `/tools/<opaque-id>` exposes authenticated private info and bundle WebMCP
   tools for easy agent activation.
 - Every private Function performs an owner-scoped lookup, returns 404 across
@@ -196,17 +202,20 @@ Missing:
 - Production cross-owner verification with a second account, plus deletion and
   export controls. The authenticated stored-record and injection path is
   verified with the primary owner.
-- General local adapter import, permission preview, and additional templates.
-- Encryption/key management, deletion/export/revocation, quotas, and audit
-  controls.
-- Isolation and review rules for untrusted user-authored code.
+- Production browser verification of custom import/decrypt/inject/discover,
+  plus additional reviewed templates.
+- Recovery-key UX, deletion/export/revocation, configurable quotas, and audit
+  controls. The current browser-local key is intentionally not server-backed.
+- Stronger isolation for untrusted owner-authored code. Exact page guards are
+  enforced, but source runs in the target page main world and its declared
+  network allowlist is not a JavaScript sandbox.
 - A way to supplement a site that already has native WebMCP without shadowing
   its tools.
 
 Next acceptance milestone:
 
-- Verify cross-owner isolation with a second production account and add
-  deletion/export before expanding beyond reviewed templates.
+- Verify one harmless encrypted custom adapter end to end in production, then
+  verify cross-owner isolation with a second account and add deletion/export.
 
 ### R6. Multi-step and composed tools
 
@@ -257,13 +266,16 @@ Shipped:
 - Owner-scoped private-tool keys in a dedicated Netlify Blobs store.
 - Server-side owner checks on list, detail, and bundle delivery.
 - Opaque tool URLs that are intentionally not bearer credentials.
+- General private adapter packages with individual tool listings.
+- Client-encrypted custom source with a browser-local key and owner-scoped
+  ciphertext delivery.
 
 Missing:
 
 - Production cross-owner isolation verification with a second account.
   Identity, GitHub login, owner record creation, authenticated retrieval, and
   private bundle delivery are verified.
-- Organizations, membership, roles, invitations, encrypted private artifacts,
+- Organizations, membership, roles, invitations, recovery-key management,
   audit logs, secret handling, sharing controls, revocation, and formal tenant
   isolation review.
 
@@ -330,8 +342,8 @@ Next acceptance milestone:
 2. Verify the no-match queue and consented telemetry persistence in production.
 3. Add a trusted local lifecycle supervisor with out-of-context bundle fetch,
    hash verification, and document reinjection.
-4. Enable and verify the private workspace in production, then add
-   deletion/export and permission preview.
+4. Verify encrypted custom import/decrypt/inject in production, then add
+   private deletion/export and recovery-key UX.
 
 ### Later platform milestones
 

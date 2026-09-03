@@ -4,14 +4,26 @@ import type { AdapterManifest } from "../../adapter-sdk/src/types";
 export const PRIVATE_TOOL_TEMPLATE = "linkedin.fixed-recipient-messaging" as const;
 export const PRIVATE_TOOL_VERSION = "1.0.0";
 
+export type PrivateToolKind = "template" | "encrypted-custom";
+
+export interface EncryptedPrivateSource {
+  algorithm: "AES-GCM";
+  iv: string;
+  ciphertext: string;
+}
+
 export interface PrivateToolRecord {
   id: string;
   ownerId: string;
   label: string;
   slug: string;
-  template: typeof PRIVATE_TOOL_TEMPLATE;
-  version: typeof PRIVATE_TOOL_VERSION;
-  recipientProfileUrls: string[];
+  kind?: PrivateToolKind;
+  template?: typeof PRIVATE_TOOL_TEMPLATE;
+  version: string;
+  recipientProfileUrls?: string[];
+  manifest?: AdapterManifest;
+  encryptedSource?: EncryptedPrivateSource;
+  sourceHash?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -19,9 +31,14 @@ export interface PrivateToolRecord {
 export interface PrivateToolSummary {
   id: string;
   label: string;
-  template: typeof PRIVATE_TOOL_TEMPLATE;
+  kind: PrivateToolKind;
+  template?: typeof PRIVATE_TOOL_TEMPLATE;
   version: string;
-  recipientProfileUrls: string[];
+  recipientProfileUrls?: string[];
+  origins: string[];
+  pathPatterns: string[];
+  tools: AdapterManifest["tools"];
+  encryption: "generated-template" | "client-aes-gcm";
   toolUrl: string;
   createdAt: string;
   updatedAt: string;
@@ -83,6 +100,7 @@ export function createPrivateToolRecord(ownerId: string, input: { label: unknown
   return {
     id: crypto.randomUUID(),
     ownerId,
+    kind: "template",
     ...normalized,
     template: PRIVATE_TOOL_TEMPLATE,
     version: PRIVATE_TOOL_VERSION,
@@ -92,19 +110,114 @@ export function createPrivateToolRecord(ownerId: string, input: { label: unknown
 }
 
 export function summarizePrivateTool(record: PrivateToolRecord): PrivateToolSummary {
+  const manifest = getPrivateToolManifest(record);
   return {
     id: record.id,
     label: record.label,
+    kind: record.kind ?? "template",
     template: record.template,
     version: record.version,
     recipientProfileUrls: record.recipientProfileUrls,
+    origins: manifest.origins,
+    pathPatterns: manifest.pathPatterns,
+    tools: manifest.tools,
+    encryption: record.kind === "encrypted-custom" ? "client-aes-gcm" : "generated-template",
     toolUrl: `/tools/${record.id}`,
     createdAt: record.createdAt,
     updatedAt: record.updatedAt,
   };
 }
 
+function stringArray(value: unknown, name: string, options: { min: number; max: number; itemMax: number }) {
+  if (!Array.isArray(value) || value.length < options.min || value.length > options.max || value.some((item) => typeof item !== "string" || item.length < 1 || item.length > options.itemMax)) {
+    throw new Error(`${name} must contain ${options.min} through ${options.max} bounded strings.`);
+  }
+  return value as string[];
+}
+
+function normalizeCustomManifest(id: string, label: string, value: unknown): AdapterManifest {
+  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("manifest must be an object.");
+  const input = value as Record<string, unknown>;
+  const allowed = ["version", "origins", "pathPatterns", "networkAllowlist", "tools"];
+  const extras = Object.keys(input).filter((key) => !allowed.includes(key));
+  if (extras.length) throw new Error(`Unknown manifest fields: ${extras.join(", ")}.`);
+  if (typeof input.version !== "string" || !/^\d+\.\d+\.\d+$/.test(input.version)) throw new Error("manifest.version must use x.y.z format.");
+  const origins = stringArray(input.origins, "manifest.origins", { min: 1, max: 5, itemMax: 200 }).map((origin) => {
+    let parsed: URL;
+    try { parsed = new URL(origin); } catch { throw new Error("Every manifest origin must be a complete HTTPS origin."); }
+    if (parsed.protocol !== "https:" || parsed.username || parsed.password || parsed.pathname !== "/" || parsed.search || parsed.hash) throw new Error("Every manifest origin must be an exact HTTPS origin without a path.");
+    return parsed.origin;
+  });
+  if (new Set(origins).size !== origins.length) throw new Error("manifest.origins must be unique.");
+  const pathPatterns = stringArray(input.pathPatterns, "manifest.pathPatterns", { min: 1, max: 10, itemMax: 200 });
+  if (pathPatterns.some((path) => !path.startsWith("/"))) throw new Error("Every path pattern must start with /.");
+  const networkAllowlist = stringArray(input.networkAllowlist ?? [], "manifest.networkAllowlist", { min: 0, max: 20, itemMax: 300 });
+  if (networkAllowlist.some((path) => !path.startsWith("/"))) throw new Error("Every network allowlist entry must be a same-origin path starting with /.");
+  if (!Array.isArray(input.tools) || input.tools.length < 1 || input.tools.length > 10) throw new Error("manifest.tools must contain 1 through 10 tools.");
+  const tools = input.tools.map((raw) => {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) throw new Error("Every tool manifest must be an object.");
+    const tool = raw as Record<string, unknown>;
+    const toolAllowed = ["name", "description", "routeFamily", "readOnly", "requiresConfirmation", "inputSchema"];
+    const toolExtras = Object.keys(tool).filter((key) => !toolAllowed.includes(key));
+    if (toolExtras.length) throw new Error(`Unknown tool fields: ${toolExtras.join(", ")}.`);
+    if (typeof tool.name !== "string" || !/^adaptab_[a-z0-9_]{3,56}$/.test(tool.name)) throw new Error("Private tool names must start with adaptab_ and contain only lowercase letters, numbers, and underscores.");
+    if (typeof tool.description !== "string" || tool.description.length < 10 || tool.description.length > 500) throw new Error("Every tool needs a description of 10 through 500 characters.");
+    if (typeof tool.routeFamily !== "string" || tool.routeFamily.length < 1 || tool.routeFamily.length > 100) throw new Error("Every tool needs a bounded routeFamily.");
+    if (typeof tool.readOnly !== "boolean" || typeof tool.requiresConfirmation !== "boolean") throw new Error("Every tool must declare readOnly and requiresConfirmation.");
+    if (!tool.readOnly && !tool.requiresConfirmation) throw new Error("Every mutating private tool must require confirmation.");
+    if (!tool.inputSchema || typeof tool.inputSchema !== "object" || Array.isArray(tool.inputSchema) || JSON.stringify(tool.inputSchema).length > 8192) throw new Error("Every tool needs a bounded object inputSchema.");
+    return tool as unknown as AdapterManifest["tools"][number];
+  });
+  if (new Set(tools.map(({ name }) => name)).size !== tools.length) throw new Error("Private tool names must be unique within an adapter.");
+  return {
+    id: `private.${id}`,
+    version: input.version,
+    publisher: "private-workspace-owner",
+    visibility: "private",
+    execution: "page",
+    product: label,
+    origins,
+    pathPatterns,
+    intentPatterns: [label.toLocaleLowerCase("en-US")],
+    networkAllowlist,
+    tools,
+  };
+}
+
+export function createEncryptedPrivateToolRecord(ownerId: string, input: { label: unknown; manifest: unknown; encryptedSource: unknown; sourceHash: unknown }, now = new Date()): PrivateToolRecord {
+  if (typeof input.label !== "string" || input.label.trim().length < 3 || input.label.trim().length > 80) throw new Error("label must contain 3 through 80 characters.");
+  const id = crypto.randomUUID();
+  const manifest = normalizeCustomManifest(id, input.label.trim(), input.manifest);
+  if (!input.encryptedSource || typeof input.encryptedSource !== "object" || Array.isArray(input.encryptedSource)) throw new Error("encryptedSource must be an object.");
+  const encrypted = input.encryptedSource as Record<string, unknown>;
+  if (encrypted.algorithm !== "AES-GCM" || typeof encrypted.iv !== "string" || !/^[A-Za-z0-9_-]{16}$/.test(encrypted.iv) || typeof encrypted.ciphertext !== "string" || encrypted.ciphertext.length < 16 || encrypted.ciphertext.length > 110000 || !/^[A-Za-z0-9_-]+$/.test(encrypted.ciphertext)) throw new Error("encryptedSource must be a bounded AES-GCM payload.");
+  if (typeof input.sourceHash !== "string" || !/^[a-f0-9]{64}$/.test(input.sourceHash)) throw new Error("sourceHash must be a SHA-256 value.");
+  const timestamp = now.toISOString();
+  return {
+    id,
+    ownerId,
+    kind: "encrypted-custom",
+    label: input.label.trim(),
+    slug: input.label.trim().toLocaleLowerCase("en-US").replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").slice(0, 32) || "custom_adapter",
+    version: manifest.version,
+    manifest,
+    encryptedSource: encrypted as unknown as EncryptedPrivateSource,
+    sourceHash: input.sourceHash,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  };
+}
+
+export function getPrivateToolManifest(record: PrivateToolRecord): AdapterManifest {
+  if (record.kind === "encrypted-custom") {
+    if (!record.manifest || !record.encryptedSource || !record.sourceHash) throw new Error("Encrypted private adapter is incomplete.");
+    return record.manifest;
+  }
+  return buildPrivateToolBundle(record).manifest;
+}
+
 export function buildPrivateToolBundle(record: PrivateToolRecord) {
+  if (record.kind === "encrypted-custom" || !record.recipientProfileUrls) throw new Error("This record uses encrypted custom bundle delivery.");
   const suffix = record.id.replace(/-/g, "").slice(0, 8);
   const prepareTool = `adaptab_prepare_${record.slug}_${suffix}`.slice(0, 64);
   const sendTool = `adaptab_send_${record.slug}_${suffix}`.slice(0, 64);

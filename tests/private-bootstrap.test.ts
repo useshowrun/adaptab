@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { registerPrivateBootstrapTools } from "../apps/web/src/register-private-tools";
+import { registerPrivateBootstrapTools, registerPrivateWorkspaceTools } from "../apps/web/src/register-private-tools";
 
 const originalDocument = globalThis.document;
 const originalWindow = globalThis.window;
@@ -16,5 +16,13 @@ describe("private activation bootstrap", () => {
     Object.defineProperty(globalThis, "window", { configurable: true, writable: true, value: {} });
     await expect(registerPrivateBootstrapTools("00000000-0000-4000-8000-000000000000")).resolves.toBe("registered");
     expect(definitions.map(({ name }) => name)).toEqual(["adaptab_private_tool_info", "adaptab_get_private_bundle"]);
+  });
+
+  it("registers an owner-only workspace listing tool", async () => {
+    const definitions: Array<{ name: string }> = [];
+    Object.defineProperty(globalThis, "document", { configurable: true, writable: true, value: { modelContext: { registerTool: (definition: { name: string }) => { definitions.push(definition); } } } });
+    Object.defineProperty(globalThis, "window", { configurable: true, writable: true, value: {} });
+    await expect(registerPrivateWorkspaceTools()).resolves.toBe("registered");
+    expect(definitions.map(({ name }) => name)).toEqual(["adaptab_list_private_tools"]);
   });
 });

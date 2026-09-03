@@ -358,30 +358,42 @@ Implemented progression:
    authorization-checked Functions.
 3. Declarative fixed-recipient LinkedIn configurations stored in an
    owner-scoped Netlify Blobs namespace.
+4. A general workspace that lists individual WebMCP tools and accepts custom
+   private adapter manifests for any exact HTTPS origin.
+5. Client-side AES-GCM encryption for custom source. Only ciphertext, IV,
+   integrity hash, manifest, and owner metadata reach Netlify Blobs; the raw
+   key remains in the importing browser profile.
 
 Next progression:
 
-4. Deletion/export/revocation, audit records, quotas, and encryption/key
-   management appropriate to private artifacts.
-5. A sandboxed local-import path for additional reviewed templates.
-6. Team workspaces and roles.
+6. Deletion/export/revocation, audit records, quotas, and recovery-key UX.
+7. Additional reviewed templates and stronger isolation for owner-authored
+   code.
+8. Team workspaces and roles.
 
 The current private activation flow is:
 
 ```text
 signed-in /workspace
--> validate a fixed-recipient declarative configuration
+-> create a reviewed template configuration OR preview a custom manifest
+-> encrypt custom source and retain its key in the browser
 -> persist under an owner-scoped key
 -> open opaque /tools/<id> locator
 -> authenticate and owner-check every info/bundle request
--> return reviewed generated source with private, no-store caching
--> trusted browser bridge verifies and injects into LinkedIn
+-> return reviewed source OR owner ciphertext with private, no-store caching
+-> decrypt custom source in the signed-in browser
+-> trusted browser bridge verifies and injects into the declared target page
 ```
 
 Private configuration is not part of the repository or public catalog. The
 first template accepts one to three LinkedIn profile URLs and generates a
-preview plus separately confirmed batch send. It does not accept arbitrary
-JavaScript.
+preview plus separately confirmed batch send. Custom imports are a separate,
+explicitly unreviewed path: the workspace previews their exact origins, paths,
+declared network access, tool schemas, and write classification before local
+encryption. The generated wrapper enforces origin, path, and top-level
+document scope, but owner source still executes in the page main world. A
+manifest network allowlist describes permission and review intent; it is not a
+security sandbox for arbitrary JavaScript.
 
 Never execute an unreviewed community submission as a public adapter. Public
 submissions require source review, fixture tests, route matching, risk
@@ -480,8 +492,12 @@ not individual user activity.
 - Private adapters are never exposed through the public catalog.
 - Opaque private-tool URLs are identifiers, not credentials; every access is
   authenticated and owner-scoped on the server.
-- User configuration is data consumed by reviewed templates, never executable
-  source accepted from a form.
+- Reviewed template configuration remains data-only. Owner-authored source is
+  accepted only through the custom private path, encrypted client-side before
+  upload, and never made public or committed to Git.
+- Losing the importing browser's local key currently makes its custom source
+  unrecoverable; recovery/export UX is required before team or production-
+  critical use.
 
 ## MVP implementation sequence
 
@@ -501,7 +517,7 @@ not individual user activity.
 
 - Chrome extension
 - always-on remote MCP server
-- encrypted private artifacts, deletion/export, and audit controls
+- private deletion/export, recovery-key UX, and audit controls
 - team roles and sharing
 - automatic community publication
 - Sales Navigator and Recruiter implementations

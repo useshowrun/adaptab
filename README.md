@@ -67,9 +67,12 @@ The MVP ships six route- and intent-filtered adapters:
   at-most-once send attempts.
 
 The repository also contains a private-workspace MVP at `/workspace`. A
-signed-in user can create an owner-only, fixed-recipient LinkedIn messaging
-adapter from reviewed template code. Private configurations are stored
-separately, excluded from `/api/catalog`, and delivered only after a server-side
+signed-in user can create an owner-only adapter from the reviewed LinkedIn
+recipient-group template or import a custom adapter for any HTTPS origin. The
+workspace lists every individual WebMCP tool inside each adapter package.
+Custom source is AES-GCM encrypted in the browser before upload; Netlify stores
+the ciphertext and the decryption key stays in that browser profile. Private
+records are excluded from `/api/catalog` and delivered only after a server-side
 owner check. An opaque `/tools/<id>` URL locates the tool but never authorizes
 access by itself.
 
@@ -121,9 +124,15 @@ locally.
 - Search outreach is limited to three visible People results, requires a full
   preview plus batch-specific confirmation, permits one attempted batch per
   document, and stops after ambiguity.
-- Private tool creation accepts declarative configuration only—never arbitrary
-  JavaScript. Every private read and bundle delivery is scoped to the current
-  Netlify Identity user and returned with no-store caching.
+- Reviewed private templates accept bounded declarative configuration. Custom
+  private imports may contain owner-supplied JavaScript, which is encrypted in
+  the browser, remains outside Git, and is never received by Netlify in
+  plaintext. It is unreviewed code that runs with target-page access, so the UI
+  previews origins, paths, declared network access, tools, and write risk.
+- Custom private bundles enforce exact origin, declared path, and top-level
+  document guards. The declared network list is metadata, not a JavaScript
+  sandbox. Every private read and ciphertext delivery remains owner-scoped and
+  uses no-store caching.
 
 AdapTab does not grant permission to automate a website. Adapter authors and
 users must comply with the target service's terms, applicable law, and their

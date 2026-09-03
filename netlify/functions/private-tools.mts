@@ -2,6 +2,7 @@ import { getUser, verifyRequestOrigin } from "@netlify/identity";
 import type { Config } from "@netlify/functions";
 import {
   createPrivateToolRecord,
+  createEncryptedPrivateToolRecord,
   summarizePrivateTool,
   type PrivateToolRepository,
 } from "../../packages/private-tools/src/index";
@@ -33,18 +34,29 @@ export function createPrivateToolsHandler(dependencies: Dependencies) {
         return json({ user: { id: user.id, email: user.email }, tools: records.map(summarizePrivateTool) });
       }
       dependencies.verifyOrigin(request);
-      const body = await parseJsonBody(request, 4096);
-      assertKeys(body, ["label", "recipientProfileUrls"]);
+      const body = await parseJsonBody(request, 150000);
       const existing = await dependencies.repository.list(user.id);
       if (existing.length >= 20) {
         throw new HttpError(409, "private_tool_limit", "This MVP workspace is limited to 20 private tools.");
       }
       let record;
       try {
-        record = createPrivateToolRecord(user.id, {
-          label: body.label,
-          recipientProfileUrls: body.recipientProfileUrls,
-        });
+        if (body.kind === "encrypted-custom") {
+          assertKeys(body, ["kind", "label", "manifest", "encryptedSource", "sourceHash"]);
+          record = createEncryptedPrivateToolRecord(user.id, {
+            label: body.label,
+            manifest: body.manifest,
+            encryptedSource: body.encryptedSource,
+            sourceHash: body.sourceHash,
+          });
+        } else {
+          assertKeys(body, ["kind", "label", "recipientProfileUrls"]);
+          if (body.kind !== undefined && body.kind !== "template") throw new Error("kind is not supported.");
+          record = createPrivateToolRecord(user.id, {
+            label: body.label,
+            recipientProfileUrls: body.recipientProfileUrls,
+          });
+        }
       } catch (error) {
         throw new HttpError(400, "invalid_input", error instanceof Error ? error.message : "The private tool is invalid.");
       }

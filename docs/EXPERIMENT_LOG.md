@@ -132,7 +132,8 @@ The first private adapter slice is implemented and covered by automated tests:
 - unauthenticated private-list access returns 401;
 - a different signed-in owner receives 404 for another owner's opaque tool ID;
 - approved LinkedIn profile origins are canonicalized and lookalikes rejected;
-- arbitrary JavaScript is not accepted—only a label and one to three URLs;
+- the reviewed template accepts no arbitrary JavaScript—only a label and one
+  to three URLs;
 - generated bundles are private, integrity-addressed, and returned with
   `private, no-store` caching;
 - the public catalog filters on `visibility: public` explicitly; and
@@ -151,6 +152,14 @@ the generated read-only preview tool and separately confirmed send tool. The
 test intentionally invoked neither, so it made no recipient-resolution
 requests and sent no messages. Cross-owner 404 behavior is unit-tested but
 still needs a second production identity for live verification.
+
+The next private-library slice adds a general custom import path. Automated
+tests verify manifest bounds, confirmation requirements for mutations,
+client-side AES-GCM round trips, missing-key failure, ciphertext-only server
+delivery, and origin/path/top-level guards. The workspace now lists the
+individual WebMCP tools within every private adapter and registers
+`adaptab_list_private_tools` for agent discovery. A production browser
+import/decrypt/inject test is still required before this slice is marked live.
 
 ## GitHub public adapter test
 

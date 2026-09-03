@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildPrivateToolBundle,
+  createEncryptedPrivateToolRecord,
   createPrivateToolRecord,
   normalizeLinkedInProfileUrl,
   type PrivateToolRecord,
@@ -53,6 +54,44 @@ describe("private tool configuration", () => {
     expect(listPublicAdapters()).not.toHaveLength(0);
     expect(listPublicAdapters().every((adapter) => adapter.visibility === "public")).toBe(true);
   });
+
+  it("validates an encrypted custom manifest without receiving plaintext source", () => {
+    const record = createEncryptedPrivateToolRecord("owner-a", {
+      label: "Internal portal reader",
+      manifest: {
+        version: "1.0.0",
+        origins: ["https://portal.example.com"],
+        pathPatterns: ["/*"],
+        networkAllowlist: ["/api/items"],
+        tools: [{
+          name: "adaptab_internal_list_items",
+          description: "List a bounded set of items from the private portal.",
+          routeFamily: "portal",
+          readOnly: true,
+          requiresConfirmation: false,
+          inputSchema: { type: "object", properties: {}, additionalProperties: false },
+        }],
+      },
+      encryptedSource: { algorithm: "AES-GCM", iv: "AAAAAAAAAAAAAAAA", ciphertext: "A".repeat(32) },
+      sourceHash: "a".repeat(64),
+    });
+    expect(record.kind).toBe("encrypted-custom");
+    expect(record.manifest?.visibility).toBe("private");
+    expect(record.manifest?.tools[0].name).toBe("adaptab_internal_list_items");
+    expect(record).not.toHaveProperty("source");
+    expect(JSON.stringify(record)).not.toContain("document.modelContext.registerTool");
+  });
+
+  it("rejects custom writes that omit confirmation", () => {
+    expect(() => createEncryptedPrivateToolRecord("owner-a", {
+      label: "Unsafe writer",
+      manifest: {
+        version: "1.0.0", origins: ["https://portal.example.com"], pathPatterns: ["/*"], networkAllowlist: [],
+        tools: [{ name: "adaptab_unsafe_write", description: "Perform an unsafe unconfirmed write.", routeFamily: "portal", readOnly: false, requiresConfirmation: false, inputSchema: { type: "object" } }],
+      },
+      encryptedSource: { algorithm: "AES-GCM", iv: "AAAAAAAAAAAAAAAA", ciphertext: "A".repeat(32) }, sourceHash: "a".repeat(64),
+    })).toThrow("require confirmation");
+  });
 });
 
 describe("private tool authorization", () => {
@@ -104,6 +143,26 @@ describe("private tool authorization", () => {
     expect(response.status).toBe(200);
     expect(response.headers.get("cache-control")).toBe("private, no-store");
     expect(payload.adapterId).toBe(`private.${record.id}`);
-    expect(payload.source).toContain(record.recipientProfileUrls[0]);
+    expect(payload.source).toContain(record.recipientProfileUrls![0]);
+  });
+
+  it("delivers only ciphertext for an encrypted custom adapter", async () => {
+    const repository = new MemoryRepository();
+    const record = createEncryptedPrivateToolRecord("owner-a", {
+      label: "Internal reader",
+      manifest: {
+        version: "1.0.0", origins: ["https://portal.example.com"], pathPatterns: ["/*"], networkAllowlist: [],
+        tools: [{ name: "adaptab_internal_reader", description: "Read a bounded value from the internal page.", routeFamily: "portal", readOnly: true, requiresConfirmation: false, inputSchema: { type: "object" } }],
+      },
+      encryptedSource: { algorithm: "AES-GCM", iv: "AAAAAAAAAAAAAAAA", ciphertext: "B".repeat(32) }, sourceHash: "b".repeat(64),
+    });
+    await repository.put(record);
+    const handler = createPrivateBundleHandler({ currentUser: async () => ({ id: "owner-a" }), repository, verifyOrigin: () => {} });
+    const response = await handler(post({ toolId: record.id, delivery: "inline" }));
+    const payload = await response.json();
+    expect(payload.encrypted).toBe(true);
+    expect(payload.source).toBeUndefined();
+    expect(payload.encryptedSource.ciphertext).toBe("B".repeat(32));
+    expect(payload.integrity.value).toBe("b".repeat(64));
   });
 });

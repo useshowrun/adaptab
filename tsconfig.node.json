@@ -20,6 +20,7 @@
     "apps/web/src/api.ts",
     "apps/web/src/register-bootstrap.ts",
     "apps/web/src/register-private-tools.ts",
+    "apps/web/src/private-crypto.ts",
     "apps/web/src/webmcp.d.ts"
   ]
 }
