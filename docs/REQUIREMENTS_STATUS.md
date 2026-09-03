@@ -198,6 +198,8 @@ Shipped:
 - `/start` resolves and retrieves both public and owner-private adapters through
   its existing four bootstrap tools. `/tools/<opaque-id>` remains available as
   a direct authenticated locator.
+- A remembered Identity session is refreshed before private-aware requests,
+  avoiding the expired-cookie race found during fresh-session production QA.
 - Every private Function performs an owner-scoped lookup, returns 404 across
   owners, and uses `private, no-store` delivery.
 - Private adapters remain excluded from `/api/catalog`. Authenticated resolve
@@ -206,17 +208,16 @@ Shipped:
 - The reviewed private template is production-verified end to end: owner-only
   bundle retrieval, hash verification, CDP injection, WebMCP discovery,
   explicit confirmation, and bounded at-most-once delivery.
+- The encrypted custom path is production-verified from the unified `/start`
+  page through local decryption, hash match, exact-origin CDP injection, native
+  WebMCP discovery, and harmless read-only invocation.
 
 Missing:
 
-- Production fresh-session verification of unified `/start` private resolution
-  and shared bundle retrieval. Owner isolation and local decryption are covered
-  by automated tests.
 - Production cross-owner verification with a second account, plus deletion and
   export controls. The authenticated stored-record and injection path is
   verified with the primary owner.
-- Production browser verification of custom decrypt/inject/discover, plus
-  additional reviewed templates. Encrypted import and listing are verified.
+- Additional reviewed templates beyond the fixed-recipient messaging workflow.
 - Recovery-key UX, deletion/export/revocation, configurable quotas, and audit
   controls. The current browser-local key is intentionally not server-backed.
 - Stronger isolation for untrusted owner-authored code. Exact page guards are

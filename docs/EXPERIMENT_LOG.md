@@ -172,8 +172,38 @@ was encrypted in the browser, the workspace immediately showed three
 individual tools across two site-independent adapter packages, and the detail
 page reported that the custom adapter's key was available in that browser.
 The activation page exposed its two private bootstrap WebMCP tools. A direct
-production decrypt/inject/discover call remains to be tested before the full
-custom activation path is marked live.
+production decrypt/inject/discover call was initially still pending.
+
+## Unified start-page private activation
+
+After the shared resolver and bundle route were deployed, production QA opened
+only `/start` in a fresh integrated-browser document. The first pass found a
+real session-lifecycle race: the browser-side Identity client still recognized
+the owner, but an expired access cookie reached the Function before the SDK's
+background refresh. The API correctly treated the call as signed out. AdapTab
+now refreshes a remembered session before private-aware API calls, with public
+signed-out requests unchanged.
+
+The corrected flow verified:
+
+- `/start` displayed three connected private WebMCP tools while keeping exactly
+  four bootstrap tool names;
+- authenticated resolution returned one intent-selected private LinkedIn
+  adapter plus relevant route-matched public alternatives, without returning
+  fixed-recipient configuration;
+- the shared bundle tool performed the owner check and returned the reviewed
+  private source with an integrity value matching resolution;
+- the same resolver selected a client-encrypted custom Raising.fi adapter;
+- the same bundle tool decrypted its source only in the browser profile holding
+  the local key and omitted ciphertext from the returned materialized bundle;
+- CDP installed the bundle into the exact Raising.fi top-level origin;
+- native WebMCP discovered the one read-only private tool, whose invocation
+  returned only the current page title, URL, and heading.
+
+This closes the custom decrypt/inject/discover gap. It does not change the
+cross-origin trust boundary: the hosted page provided the owner-authorized
+bundle, while the approved integrated-browser CDP capability performed the
+target-tab injection.
 
 ## GitHub public adapter test
 
@@ -224,7 +254,7 @@ bounded metadata.
 - Automatic reinjection by a long-running local supervisor.
 - Full browser restart and recovery.
 - A production Chrome extension.
-- Production private adapter authentication and storage round trip.
+- Production cross-owner isolation with a second Identity account.
 - Signed bundle verification end to end.
 - Native-site-tool conflict detection.
 - Sales Navigator or Recruiter adapters.

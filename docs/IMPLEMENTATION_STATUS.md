@@ -94,6 +94,16 @@ A subsequent owner-authorized production run exercised the complete reviewed-
 template flow. After a separate action-time confirmation, the send tool
 reported successful bounded delivery with retries disabled for the batch.
 
+The unified start flow was then production-tested from a fresh integrated-
+browser document. It refreshed the remembered Identity session, reported three
+owner-private tools, resolved a private LinkedIn template alongside relevant
+public alternatives, and returned its owner-checked bundle with matching
+integrity through the same `adaptab_get_bundle` tool used for public adapters.
+The same page resolved an encrypted custom Raising.fi adapter, decrypted it
+locally, removed ciphertext from the result, injected it into the exact target
+origin, discovered its native WebMCP tool, and completed a harmless read-only
+invocation.
+
 ## Next
 
 1. Record the sub-three-minute demo and complete the Devpost submission.
