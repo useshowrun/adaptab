@@ -2,6 +2,8 @@
 
 **WebMCP for every tab.**
 
+**Live app:** [adaptab.netlify.app/start](https://adaptab.netlify.app/start)
+
 AdapTab is a hosted catalog of reviewed, route-aware browser adapters. An agent
 visits one start page, resolves another open tab to the smallest compatible
 adapter, obtains an immutable installer with an integrity hash, and injects it

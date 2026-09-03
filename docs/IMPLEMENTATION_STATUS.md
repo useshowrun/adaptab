@@ -4,6 +4,7 @@ Last updated: 2026-09-03
 
 ## Working now
 
+- Public production deployment: `https://adaptab.netlify.app/start`.
 - Vite + React start page with imperative top-level WebMCP registration.
 - Four bootstrap tools: resolve, get bundle, request adapter, and report result.
 - Typed public adapter manifest and deterministic route/intent matcher.
@@ -31,15 +32,15 @@ The following real flow passed:
 7. A hard reload invalidated the old handle and removed the tool, as declared.
 8. Reinjection registered a fresh tool and a new call succeeded.
 
+The complete flow was repeated successfully against the public Netlify
+deployment and a clean Raising.fi document.
+
 This verifies the no-extension MVP path. It still requires a client with an
 approved page-injection capability such as full CDP access.
 
 ## Next
 
-1. Push the current source to a new public GitHub repository.
-2. Import that repository into Netlify and deploy a production preview.
-3. Repeat the integrated-browser test against the deployed HTTPS URL.
-4. Add the LinkedIn core company-search adapter.
-5. Add the narrowly confirmed LinkedIn messaging adapter with prepare/commit
+1. Add the LinkedIn core company-search adapter.
+2. Add the narrowly confirmed LinkedIn messaging adapter with prepare/commit
    semantics and no ambiguous retries.
-6. Polish public documentation and record the sub-three-minute demo.
+3. Polish public documentation and record the sub-three-minute demo.
