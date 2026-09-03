@@ -11,5 +11,14 @@
     "noEmit": true,
     "types": ["node", "vitest/globals"]
   },
-  "include": ["vite.config.ts", "netlify", "packages", "adapters", "tests"]
+  "include": [
+    "vite.config.ts",
+    "netlify",
+    "packages",
+    "adapters",
+    "tests",
+    "apps/web/src/api.ts",
+    "apps/web/src/register-bootstrap.ts",
+    "apps/web/src/webmcp.d.ts"
+  ]
 }

@@ -11,7 +11,7 @@ export async function registerBootstrapTools(): Promise<"registered" | "already_
   state[bootstrapMarker] = true;
 
   try {
-    await modelContext.registerTool({
+    const registrations = [modelContext.registerTool({
       name: "adaptab_resolve",
       description:
         "Resolve a target page URL and task intent to the smallest compatible AdapTab WebMCP adapter. This reads the public adapter catalog and does not access the target page.",
@@ -27,9 +27,9 @@ export async function registerBootstrapTools(): Promise<"registered" | "already_
       },
       annotations: { readOnlyHint: true },
       execute: (input) => postJson("/api/resolve", input),
-    });
+    }),
 
-    await modelContext.registerTool({
+    modelContext.registerTool({
       name: "adaptab_get_bundle",
       description:
         "Get an immutable AdapTab page-installer bundle and its SHA-256 integrity value for a previously resolved adapter version.",
@@ -45,9 +45,9 @@ export async function registerBootstrapTools(): Promise<"registered" | "already_
       },
       annotations: { readOnlyHint: true },
       execute: (input) => postJson("/api/bundle", input),
-    });
+    }),
 
-    await modelContext.registerTool({
+    modelContext.registerTool({
       name: "adaptab_request_adapter",
       description:
         "Request future AdapTab support for an unsupported website and action. Only the hostname is retained from the URL. Do not include private page data, credentials, or message text in action descriptions or notes.",
@@ -63,9 +63,9 @@ export async function registerBootstrapTools(): Promise<"registered" | "already_
         additionalProperties: false,
       },
       execute: (input) => postJson("/api/request-adapter", input),
-    });
+    }),
 
-    await modelContext.registerTool({
+    modelContext.registerTool({
       name: "adaptab_report_result",
       description:
         "Report a bounded adapter outcome to improve compatibility. Requires explicit consent and never accepts tool arguments, results, page content, cookies, messages, or account identifiers.",
@@ -86,7 +86,8 @@ export async function registerBootstrapTools(): Promise<"registered" | "already_
         additionalProperties: false,
       },
       execute: (input) => postJson("/api/report-result", input),
-    });
+    })];
+    await Promise.all(registrations);
   } catch (error) {
     delete state[bootstrapMarker];
     throw error;
