@@ -249,6 +249,23 @@ bounded metadata.
 - A third-party adapter must disclose its provenance because tools otherwise
   appear associated with the target page's origin.
 
+## Raising.fi complete public funding schema
+
+Live inspection of the public same-origin `/api/funding` response showed 14
+record fields: identifier, company name, slug, website, description, industry,
+formatted amount, numeric USD amount, round type, location, lead investor,
+other investors, raise date, and optional structured hiring data. The response
+also exposes premium state, total USD raised, a public status message, and full
+pagination metadata.
+
+`raising-fi.public.funding@1.1.0` now type-normalizes and returns all of those
+currently available public fields. Its limit accepts 1 through 40, matching the
+complete free dataset exposed by the site. Production resolution selected
+`1.1.0`, bundle integrity matched, CDP installed it into the exact Raising.fi
+origin, and a native WebMCP invocation returned formatted and numeric funding
+amounts plus the remaining record metadata. The original `1.0.0` source remains
+addressable at its prior SHA-256 for immutable-version compatibility.
+
 ## Items not yet tested
 
 - Automatic reinjection by a long-running local supervisor.
