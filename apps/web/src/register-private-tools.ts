@@ -46,7 +46,7 @@ export async function registerPrivateBootstrapTools(toolId: string): Promise<"re
       execute: () => postJson("/api/private-tool", { toolId }),
     }), modelContext.registerTool({
       name: "adaptab_get_private_bundle",
-      description: "Retrieve the reviewed, owner-authorized private adapter bundle for this activation page. The bundle must be evaluated only in an expected target origin and requires reinjection after full document navigation.",
+      description: "Retrieve the owner-authorized private adapter bundle for this activation page. Reviewed templates return generated source; custom source is decrypted only in this browser. Evaluate it only on an expected target origin and reinject after full document navigation.",
       inputSchema: {
         type: "object",
         properties: { delivery: { type: "string", enum: ["inline"] } },

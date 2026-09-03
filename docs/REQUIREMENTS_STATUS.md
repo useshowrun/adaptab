@@ -202,8 +202,8 @@ Missing:
 - Production cross-owner verification with a second account, plus deletion and
   export controls. The authenticated stored-record and injection path is
   verified with the primary owner.
-- Production browser verification of custom import/decrypt/inject/discover,
-  plus additional reviewed templates.
+- Production browser verification of custom decrypt/inject/discover, plus
+  additional reviewed templates. Encrypted import and listing are verified.
 - Recovery-key UX, deletion/export/revocation, configurable quotas, and audit
   controls. The current browser-local key is intentionally not server-backed.
 - Stronger isolation for untrusted owner-authored code. Exact page guards are
@@ -214,8 +214,9 @@ Missing:
 
 Next acceptance milestone:
 
-- Verify one harmless encrypted custom adapter end to end in production, then
-  verify cross-owner isolation with a second account and add deletion/export.
+- Finish decrypt/inject/discover verification for the harmless production
+  custom adapter, then verify cross-owner isolation with a second account and
+  add deletion/export.
 
 ### R6. Multi-step and composed tools
 
@@ -342,8 +343,8 @@ Next acceptance milestone:
 2. Verify the no-match queue and consented telemetry persistence in production.
 3. Add a trusted local lifecycle supervisor with out-of-context bundle fetch,
    hash verification, and document reinjection.
-4. Verify encrypted custom import/decrypt/inject in production, then add
-   private deletion/export and recovery-key UX.
+4. Finish encrypted custom decrypt/inject verification in production, then
+   add private deletion/export and recovery-key UX.
 
 ### Later platform milestones
 

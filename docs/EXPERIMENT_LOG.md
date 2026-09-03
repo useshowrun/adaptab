@@ -158,8 +158,16 @@ tests verify manifest bounds, confirmation requirements for mutations,
 client-side AES-GCM round trips, missing-key failure, ciphertext-only server
 delivery, and origin/path/top-level guards. The workspace now lists the
 individual WebMCP tools within every private adapter and registers
-`adaptab_list_private_tools` for agent discovery. A production browser
-import/decrypt/inject test is still required before this slice is marked live.
+`adaptab_list_private_tools` for agent discovery.
+
+In production, the authenticated owner imported a harmless read-only
+Raising.fi page-context adapter through the permission-preview UI. The source
+was encrypted in the browser, the workspace immediately showed three
+individual tools across two site-independent adapter packages, and the detail
+page reported that the custom adapter's key was available in that browser.
+The activation page exposed its two private bootstrap WebMCP tools. A direct
+production decrypt/inject/discover call remains to be tested before the full
+custom activation path is marked live.
 
 ## GitHub public adapter test
 
