@@ -47,10 +47,11 @@ searches both the reviewed public catalog and that owner's private library;
 private source remains lazy, owner-checked, and `no-store`.
 
 `/bootstrap` is separate from the human-facing
-[`/start`](https://adaptab.netlify.app/start) catalog. It loads no React UI,
-catalog list, or workspace status before registering its four tools. A capable
-agent may keep it in a background or hidden browsing context, but it is not
-page-free: closing or replacing that document removes its registered tools.
+[`/start`](https://adaptab.netlify.app/start) catalog. `/start` does not
+register WebMCP tools; `/bootstrap` loads no React UI, catalog list, or
+workspace status before registering its four tools. A capable agent may keep
+it in a background or hidden browsing context, but it is not page-free:
+closing or replacing that document removes its registered tools.
 
 “All relevant” is deliberate: the agent processes open tabs individually and
 activates only those with a route- and intent-compatible adapter. Each browser
