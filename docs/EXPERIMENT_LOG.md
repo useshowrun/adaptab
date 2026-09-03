@@ -88,6 +88,36 @@ With explicit user authorization, the test:
 LinkedIn returned HTTP 200 and the message operation reported success. No
 second send was attempted.
 
+A later production-catalog test used the reviewed prepare/send adapter with
+fresh user authorization. Exact-recipient preparation succeeded, the one-use
+draft was confirmed once, and LinkedIn again reported a successful send.
+
+## GitHub public adapter test
+
+The local AdapTab catalog resolved `github.public.user-research@1.0.0` for an
+open authenticated GitHub repository page. Its integrity values matched, CDP
+installed the bundle, and native WebMCP discovered three read-only tools.
+
+Live calls successfully:
+
+- found the Showrun organization through public user search;
+- returned its bounded public organization profile; and
+- listed its top three owner repositories by stars, excluding forks.
+
+All requests used the fixed `api.github.com` origin with credentials omitted.
+
+## Hacker News public adapter test
+
+The first Hacker News prototype registered successfully but attempted to call
+the public Algolia HN Search API across origins. A real WebMCP invocation
+failed because Hacker News's `default-src 'self'` content-security policy also
+restricts fetch connections.
+
+That prototype was not published. It was replaced with
+`hacker-news.public.front-page@1.0.0`, a network-free tool that reads the
+current top-level Hacker News document. After a clean reload and injection,
+native WebMCP returned three live front-page stories with bounded metadata.
+
 ## Conclusions supported by the experiments
 
 - An extension is not required for execution when a trusted host already has
@@ -111,9 +141,6 @@ second send was attempted.
 - A production Chrome extension.
 - Private adapter authentication and storage.
 - Signed bundle verification end to end.
-- Route matching from the deployed AdapTab catalog.
-- Netlify deployment and persistence.
 - Native-site-tool conflict detection.
 - Sales Navigator or Recruiter adapters.
 - Multi-step composed tools.
-

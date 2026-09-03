@@ -16,11 +16,16 @@ Last updated: 2026-09-03
   CSRF derivation inside the page, bounded results, and no credential export.
 - `linkedin.messaging.send-message@1.0.0` with exact profile verification,
   short-lived prepare/confirm drafts, and pre-request at-most-once locking.
+- `github.public.user-research@1.0.0` with public user search, bounded profile
+  lookup, and top owner repositories by stars.
+- `hacker-news.public.front-page@1.0.0` with bounded, network-free extraction
+  of the current front page. The first cross-origin search design was rejected
+  during browser verification because Hacker News CSP blocks the request.
 - Netlify Functions for catalog, resolution, bundle delivery, adapter requests,
   and opt-in telemetry.
 - Netlify Blobs append-only storage for sanitized requests and telemetry,
   namespaced by deployment context.
-- Twenty automated tests plus production build validation.
+- Twenty-nine automated tests plus production build validation.
 
 ## Verified in ChatGPT's integrated browser
 
@@ -57,6 +62,8 @@ approved page-injection capability such as full CDP access.
 
 ## Next
 
-1. Polish public documentation and record the sub-three-minute demo.
-2. Add a guided adapter-authoring workflow using the existing manifests as
+1. Verify the GitHub and Hacker News groups from the deployed catalog in clean
+   target documents.
+2. Record the sub-three-minute demo and complete the Devpost submission.
+3. Add a guided adapter-authoring workflow using the existing manifests as
    examples and Showrun only as prior-art reference material.

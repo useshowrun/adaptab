@@ -62,6 +62,41 @@ describe("adapter resolution", () => {
       expect(result.tools[1]).toMatchObject({ readOnly: false, requiresConfirmation: true });
     }
   });
+
+  it("selects the GitHub public user-research group", () => {
+    const result = resolveAdapter({
+      url: "https://github.com/useshowrun/adaptab",
+      intent: "list the organization's top repositories by stars",
+      client: "chatgpt-integrated-browser",
+    });
+    expect(result.matched).toBe(true);
+    if (result.matched) {
+      expect(result.match.adapterId).toBe("github.public.user-research");
+      expect(result.tools.map((tool) => tool.name)).toEqual([
+        "adaptab_github_search_users",
+        "adaptab_github_get_user",
+        "adaptab_github_list_top_repositories",
+      ]);
+    }
+  });
+
+  it("selects the Hacker News current front-page group", () => {
+    const result = resolveAdapter({
+      url: "https://news.ycombinator.com/news",
+      intent: "list the current Hacker News front page",
+      client: "cdp",
+    });
+    expect(result.matched).toBe(true);
+    if (result.matched) {
+      expect(result.match.adapterId).toBe("hacker-news.public.front-page");
+      expect(result.tools.map((tool) => tool.name)).toEqual(["adaptab_hacker_news_front_page"]);
+    }
+    expect(resolveAdapter({
+      url: "https://news.ycombinator.com.attacker.test/news",
+      intent: "Hacker News",
+      client: "cdp",
+    }).matched).toBe(false);
+  });
 });
 
 describe("immutable bundle", () => {

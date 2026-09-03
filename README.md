@@ -30,14 +30,34 @@ Trusted browser bridge
   → inject into the approved target tab
 Target document
   → register WebMCP tools
-  → make bounded same-origin requests with the live browser session
+  → make bounded allowlisted requests, using the live session only when needed
 ```
+
+## Judge quickstart
+
+Open the [live AdapTab start page](https://adaptab.netlify.app/start) and one
+supported target page in ChatGPT's in-app browser. Enable full CDP access for
+the target only when ChatGPT requests it, then ask:
+
+> Use AdapTab to equip my open target tab for the task I request. Resolve the
+> smallest matching adapter, fetch the exact bundle, verify its SHA-256 and
+> expected origin, inject it with CDP Runtime.evaluate, rediscover its WebMCP
+> tools, and use the relevant tool.
+
+For a no-login test, open `https://news.ycombinator.com/` and ask for the
+current Hacker News front page, or open `https://raising.fi/` and ask for
+recent funding. The hosted AdapTab page is a catalog/control plane; the
+trusted browser bridge performs cross-tab injection.
 
 ## Current demo
 
-The MVP ships three route- and intent-filtered adapters:
+The MVP ships five route- and intent-filtered adapters:
 
 - `raising-fi.public.funding@1.0.0` for the public Raising.fi funding preview.
+- `github.public.user-research@1.0.0` for public user search, profile lookup,
+  and top repositories by stars.
+- `hacker-news.public.front-page@1.0.0` for a bounded, network-free reading of
+  the current front page.
 - `linkedin.core.company-search@1.0.0` for authenticated LinkedIn company
   search using the current page session.
 - `linkedin.messaging.send-message@1.0.0` for an exact recipient/message
@@ -73,7 +93,8 @@ production build.
 
 ## Security model
 
-- Exact origin and route checks run during resolution and again at install.
+- Exact target origins are checked during resolution, installation, and tool
+  execution; route families are filtered during resolution.
 - Bundle SHA-256 values provide transport/integrity verification; they are not
   publisher signatures.
 - Adapters return bounded data and never return credentials.
@@ -101,10 +122,16 @@ and is not the hackathon entry. It informed the deterministic, network-first
 adapter approach, but no Showrun CLI skill is required to run AdapTab and no
 Showrun source is vendored in this repository.
 
+The [Showrun migration matrix](docs/SHOWRUN_MIGRATION.md) pins the prior-work
+snapshot, records every capability family, and distinguishes reviewed AdapTab
+ports from queued research.
+
 ## Documentation
 
 See [docs/PRODUCT_PLAN.md](docs/PRODUCT_PLAN.md) and
 [docs/EXPERIMENT_LOG.md](docs/EXPERIMENT_LOG.md) for the architecture and tested
 browser behavior. [docs/IMPLEMENTATION_STATUS.md](docs/IMPLEMENTATION_STATUS.md)
 records the reproducible MVP results, and [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
-covers Netlify deployment.
+covers Netlify deployment. [docs/SHOWRUN_MIGRATION.md](docs/SHOWRUN_MIGRATION.md)
+tracks prior-art recipes as they are independently converted into reviewed
+AdapTab adapters.

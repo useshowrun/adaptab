@@ -1,4 +1,8 @@
 import { createHash } from "node:crypto";
+import { githubPublicBundleSource } from "../../../adapters/github/public/bundle";
+import { githubPublicManifest } from "../../../adapters/github/public/manifest";
+import { hackerNewsPublicBundleSource } from "../../../adapters/hacker-news/public/bundle";
+import { hackerNewsPublicManifest } from "../../../adapters/hacker-news/public/manifest";
 import { raisingFiBundleSource } from "../../../adapters/raising-fi/bundle";
 import { raisingFiManifest } from "../../../adapters/raising-fi/manifest";
 import { linkedinCoreBundleSource } from "../../../adapters/linkedin/core/bundle";
@@ -9,6 +13,8 @@ import type { BundleRecord, ClientKind, ResolveInput } from "../../adapter-sdk/s
 
 const bundles: BundleRecord[] = [
   { manifest: raisingFiManifest, source: raisingFiBundleSource },
+  { manifest: githubPublicManifest, source: githubPublicBundleSource },
+  { manifest: hackerNewsPublicManifest, source: hackerNewsPublicBundleSource },
   { manifest: linkedinCoreManifest, source: linkedinCoreBundleSource },
   { manifest: linkedinMessagingManifest, source: linkedinMessagingBundleSource },
 ];
