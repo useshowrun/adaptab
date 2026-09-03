@@ -118,6 +118,7 @@ export function resolveAdapter(input: ResolveInput) {
       integrity: { algorithm: "sha256" as const, value: sha256(source) },
     },
     tools: manifest.tools,
+    limits: manifest.limits,
     activation: {
       method: "cdp-runtime-evaluate" as const,
       nextTool: "adaptab_get_bundle",
@@ -125,7 +126,7 @@ export function resolveAdapter(input: ResolveInput) {
       expectedOrigins: manifest.origins,
       expectedPaths: manifest.pathPatterns,
       execution: manifest.execution,
-      ...activationGuidance(manifest.id),
+      ...activationGuidance(manifest),
       lifecycle: {
         scope: "current_document" as const,
         spaNavigation: "usually_preserved" as const,

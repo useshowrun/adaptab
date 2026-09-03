@@ -127,6 +127,19 @@ Private Identity flows require Netlify's runtime. Enable Netlify Identity and
 use `netlify dev` rather than the Vite-only command when testing authentication
 locally.
 
+## Build an adapter
+
+Public and private adapters share the
+[adapter authoring contract](docs/ADAPTER_AUTHORING.md). It requires explicit
+single-tab/navigation guidance and rejects unexplained numeric input caps.
+Adapters should expose the authorized capability actually available: do not
+add demo limits, silently omit useful fields, or open one page per resource
+when a known request can operate from the existing target tab.
+
+Public contributions use the pull-request checklist and human review. Private
+workspace imports carry the same execution and limit metadata, preview it
+before upload, and keep custom source client-encrypted.
+
 ## Security model
 
 - Exact target origins are checked during resolution, installation, and tool
@@ -184,4 +197,5 @@ covers Netlify deployment. [docs/SHOWRUN_MIGRATION.md](docs/SHOWRUN_MIGRATION.md
 tracks prior-art recipes as they are independently converted into reviewed
 AdapTab adapters. [docs/REQUIREMENTS_STATUS.md](docs/REQUIREMENTS_STATUS.md)
 is the living ledger for the original requirements, shipped evidence, gaps,
-and next milestones.
+and next milestones. [docs/ADAPTER_AUTHORING.md](docs/ADAPTER_AUTHORING.md) is
+the shared contract for public contributors and private workspace builders.

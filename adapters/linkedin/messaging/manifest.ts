@@ -33,6 +33,15 @@ export const linkedinMessagingManifest: AdapterManifest = {
     "/voyager/api/me",
     "/voyager/api/voyagerMessagingDashMessengerMessages",
   ],
+  executionPolicy: {
+    tabStrategy: "reuse_resolved_top_level_tab",
+    additionalTabsRequired: false,
+    resourceUrls: "tool_inputs",
+    profileResolution: "same_origin_network_requests",
+    requestConcurrency: "sequential",
+  },
+  agentGuidance: "Reuse one already-open signed-in LinkedIn top-level tab. Recipient profile URLs are tool inputs, not pages to open. Do not create or navigate to a tab for each recipient; resolve and send through known same-origin requests from the same document.",
+  limits: [],
   tools: [
     {
       name: "adaptab_linkedin_prepare_message",

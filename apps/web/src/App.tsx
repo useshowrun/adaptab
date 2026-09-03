@@ -67,7 +67,7 @@ function PublicCatalog() {
 
   return (
     <main>
-      <nav><a className="wordmark" href="/start">AdapTab</a><div className="nav-actions"><a href="/workspace">Private workspace</a><a href="https://github.com/useshowrun/showrun">Prior art: Showrun</a></div></nav>
+      <nav><a className="wordmark" href="/start">AdapTab</a><div className="nav-actions"><a href="https://github.com/useshowrun/adaptab/blob/main/docs/ADAPTER_AUTHORING.md">Build an adapter</a><a href="/workspace">Private workspace</a><a href="https://github.com/useshowrun/showrun">Prior art: Showrun</a></div></nav>
       <section className="hero">
         <p className="eyebrow">OPEN ADAPTER CATALOG</p>
         <h1>WebMCP for<br /><em>every tab.</em></h1>

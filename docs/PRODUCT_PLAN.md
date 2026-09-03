@@ -375,8 +375,24 @@ interface AdapterManifest {
     allowedOrigins: string[];
     allowedPathPatterns: string[];
   };
+
+  executionPolicy: {
+    tabStrategy: "reuse_resolved_top_level_tab" | "additional_tabs_required";
+    additionalTabsRequired: boolean;
+    resourceUrls: "tool_inputs" | "navigation_targets" | "not_applicable";
+    profileResolution: "same_origin_network_requests" | "page_navigation" | "not_applicable";
+    requestConcurrency: "sequential" | "parallel" | "mixed" | "not_applicable";
+  };
+  agentGuidance: string;
+  limits: AdapterLimitManifest[];
 }
 ```
+
+The shared [adapter authoring contract](ADAPTER_AUTHORING.md) applies to public
+and private adapters. It prohibits silent/demo restrictions, requires every
+functional limit to declare its reason and source, and requires structured plus
+textual tab/navigation guidance. Numeric tool-input maxima fail validation
+without matching limit declarations.
 
 The adapter source must validate the target origin at installation and again
 before execution. It should use exact endpoint allowlists, narrow schemas,
@@ -438,10 +454,13 @@ Never execute an unreviewed community submission as a public adapter. Public
 submissions require source review, fixture tests, route matching, risk
 classification, and immutable versioning.
 
-## Community authoring skill
+## Community authoring
 
-A future `adaptab-author` skill should turn Showrun-style network research into
-a reviewable adapter pull request. It should instruct agents to:
+The repository now publishes `ADAPTER_AUTHORING.md`, validates the execution
+and limit contract for published manifests and private imports, and provides a
+pull-request checklist. A future `adaptab-author` scaffolding skill should turn
+Showrun-style network research into a reviewable adapter pull request. It
+should instruct agents to:
 
 1. Define the authorized workflow.
 2. Look for JSON/GraphQL/network requests before DOM automation.

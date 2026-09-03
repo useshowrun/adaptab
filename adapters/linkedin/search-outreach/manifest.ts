@@ -23,6 +23,36 @@ export const linkedinSearchOutreachManifest: AdapterManifest = {
     "/voyager/api/me",
     "/voyager/api/voyagerMessagingDashMessengerMessages",
   ],
+  executionPolicy: {
+    tabStrategy: "reuse_resolved_top_level_tab",
+    additionalTabsRequired: false,
+    resourceUrls: "tool_inputs",
+    profileResolution: "same_origin_network_requests",
+    requestConcurrency: "mixed",
+  },
+  agentGuidance: "Stay on the resolved LinkedIn People search-results tab. Do not open individual recipient profiles or create a tab per recipient; resolve previews in parallel with known same-origin requests, then perform an explicitly confirmed send from the same document.",
+  limits: [
+    {
+      id: "reviewed-batch-size",
+      scope: "input",
+      toolName: "adaptab_linkedin_prepare_search_messages",
+      inputProperty: "limit",
+      value: 3,
+      reason: "consent",
+      source: "The reviewed MVP requires one complete recipient preview and a batch-specific confirmation before mutation.",
+      configurable: true,
+      description: "This reviewed search-outreach version previews at most three recipients in one confirmed batch.",
+    },
+    {
+      id: "one-attempt-per-document",
+      scope: "execution",
+      value: "one batch attempt",
+      reason: "reliability",
+      source: "Ambiguous network writes cannot be safely retried without risking duplicate external side effects.",
+      configurable: false,
+      description: "The adapter permits one batch attempt per document and never automatically retries an ambiguous send.",
+    },
+  ],
   tools: [
     {
       name: "adaptab_linkedin_prepare_search_messages",

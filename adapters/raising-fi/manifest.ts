@@ -20,6 +20,25 @@ export const raisingFiManifest: AdapterManifest = {
     "startup rounds",
   ],
   networkAllowlist: ["/api/funding"],
+  executionPolicy: {
+    tabStrategy: "reuse_resolved_top_level_tab",
+    additionalTabsRequired: false,
+    resourceUrls: "not_applicable",
+    profileResolution: "not_applicable",
+    requestConcurrency: "sequential",
+  },
+  agentGuidance: "Reuse the resolved Raising.fi top-level tab. Call the known same-origin funding endpoint through the adapter; no additional tab or exploratory navigation is required.",
+  limits: [{
+    id: "public-dataset-record-count",
+    scope: "input",
+    toolName: "adaptab_raising_fi_list_recent_funding",
+    inputProperty: "limit",
+    value: 40,
+    reason: "upstream",
+    source: "Raising.fi's current free public dataset exposes at most 40 records.",
+    configurable: true,
+    description: "The caller may request any count up to all 40 records exposed by the current public dataset.",
+  }],
   tools: [
     {
       name: "adaptab_raising_fi_list_recent_funding",

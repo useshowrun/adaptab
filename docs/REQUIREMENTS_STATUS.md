@@ -28,7 +28,7 @@ adds evidence.
   native target-page tool discovery, and live invocation.
 - Six reviewed adapters are implemented across Raising.fi, GitHub, Hacker
   News, and three LinkedIn product groups.
-- Sixty-one automated tests and repeated integrated-browser tests pass.
+- Sixty-four automated tests and repeated integrated-browser tests pass.
 - Of the eight original product requirement groups: one is MVP complete and
   seven are partial; the private-workspace requirement now has a tested narrow
   implementation rather than only a design.
@@ -80,20 +80,27 @@ Shipped:
 - Basic validation, body bounds, and best-effort rate limiting are present.
 - The Showrun migration matrix inventories 83 prior capability folders and
   defines ten publication gates.
+- `ADAPTER_AUTHORING.md` gives public contributors and private builders the
+  same network-first, single-tab, capability-preserving contract.
+- Manifests now carry machine-readable execution policy, textual agent
+  guidance, and explicit functional-limit declarations. Numeric input maxima
+  without a reason, source, and matching declaration fail validation.
+- The public pull-request template requires provenance, limit evidence,
+  lifecycle tests, and human review.
 
 Missing:
 
 - Production verification that a submitted no-match request persists and can
   be retrieved by maintainers.
 - Maintainer backlog UI or export.
-- `adaptab-author` skill/template that generates a manifest, installer, tests,
-  and review-ready pull request.
+- `adaptab-author` scaffolding skill that generates a manifest, installer,
+  fixtures, tests, and review-ready pull request from the published contract.
 - Community contribution and human-review workflow.
 
 Next acceptance milestone:
 
 - Submit one harmless test request in production, verify its sanitized stored
-  shape, and build the local authoring template without auto-publishing code.
+  shape, and build the `adaptab-author` scaffolder without auto-publishing code.
 
 ### R3. Easier activation than per-site skill installation
 
@@ -123,6 +130,9 @@ Shipped:
   LinkedIn messaging explicitly says to reuse one authenticated tab, treat
   profile URLs as tool inputs, avoid per-recipient tabs, and use known
   same-origin requests instead of exploratory navigation.
+- The resolved execution policy and guidance now come from the selected
+  manifest, so public and private authors can describe adapter-specific tab,
+  URL, profile-resolution, and concurrency behavior.
 - Authenticated requests execute in the target document; target cookies and
   CSRF material do not go to Netlify.
 - The current operational policy is agent-level lazy injection: immediately
@@ -170,7 +180,7 @@ Shipped:
 
 - Typed manifests declare exact origins, path patterns, intent patterns,
   product names, tool schemas, read/write state, confirmation state, and
-  network allowlists.
+  network allowlists, plus execution guidance and evidenced limits.
 - Deterministic resolver intersects origin, route, intent, and supported client.
 - LinkedIn company search and messaging are separate adapter groups; a send
   intent does not load the search group.
@@ -207,6 +217,9 @@ Shipped:
 - Users can import a custom manifest and source for any bounded set of exact
   HTTPS origins. The UI previews page, declared network, read/write, and
   confirmation permissions before import.
+- Private imports must also declare tab reuse, resource-URL semantics, request
+  concurrency, textual agent guidance, and every functional limit. The
+  workspace previews those fields before client-side encryption.
 - Custom source is wrapped with origin, path, and top-level guards, then
   AES-GCM encrypted in the browser. Netlify receives owner-scoped ciphertext,
   metadata, and an integrity hash but no plaintext source or key.
@@ -368,7 +381,8 @@ Next acceptance milestone:
 
 ### Next product milestone
 
-1. Build `adaptab-author` and a reviewed contribution template.
+1. Build the `adaptab-author` scaffolder on top of the shipped authoring
+   contract and reviewed contribution template.
 2. Verify the no-match queue and consented telemetry persistence in production.
 3. Add a trusted local lifecycle supervisor with out-of-context bundle fetch,
    hash verification, and document reinjection.

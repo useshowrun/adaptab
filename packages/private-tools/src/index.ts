@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import type { AdapterManifest } from "../../adapter-sdk/src/types";
+import { normalizeAuthoringContract } from "../../adapter-sdk/src/authoring";
 
 export const PRIVATE_TOOL_TEMPLATE = "linkedin.fixed-recipient-messaging" as const;
 export const PRIVATE_TOOL_VERSION = "1.0.0";
@@ -38,6 +39,9 @@ export interface PrivateToolSummary {
   origins: string[];
   pathPatterns: string[];
   tools: AdapterManifest["tools"];
+  executionPolicy: AdapterManifest["executionPolicy"];
+  agentGuidance: string;
+  limits: AdapterManifest["limits"];
   encryption: "generated-template" | "client-aes-gcm";
   toolUrl: string;
   createdAt: string;
@@ -109,8 +113,23 @@ export function createPrivateToolRecord(ownerId: string, input: { label: unknown
   };
 }
 
+function authoringMetadata(manifest: AdapterManifest) {
+  return {
+    executionPolicy: manifest.executionPolicy ?? {
+      tabStrategy: "reuse_resolved_top_level_tab" as const,
+      additionalTabsRequired: false,
+      resourceUrls: "not_applicable" as const,
+      profileResolution: "not_applicable" as const,
+      requestConcurrency: "not_applicable" as const,
+    },
+    agentGuidance: manifest.agentGuidance ?? "Reuse the resolved top-level target tab. Prefer the adapter's deterministic tool calls over exploratory navigation.",
+    limits: manifest.limits ?? [],
+  };
+}
+
 export function summarizePrivateTool(record: PrivateToolRecord): PrivateToolSummary {
   const manifest = getPrivateToolManifest(record);
+  const authoring = authoringMetadata(manifest);
   return {
     id: record.id,
     label: record.label,
@@ -121,6 +140,7 @@ export function summarizePrivateTool(record: PrivateToolRecord): PrivateToolSumm
     origins: manifest.origins,
     pathPatterns: manifest.pathPatterns,
     tools: manifest.tools,
+    ...authoring,
     encryption: record.kind === "encrypted-custom" ? "client-aes-gcm" : "generated-template",
     toolUrl: `/tools/${record.id}`,
     createdAt: record.createdAt,
@@ -138,7 +158,7 @@ function stringArray(value: unknown, name: string, options: { min: number; max: 
 function normalizeCustomManifest(id: string, label: string, value: unknown): AdapterManifest {
   if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("manifest must be an object.");
   const input = value as Record<string, unknown>;
-  const allowed = ["version", "origins", "pathPatterns", "networkAllowlist", "tools"];
+  const allowed = ["version", "origins", "pathPatterns", "networkAllowlist", "executionPolicy", "agentGuidance", "limits", "tools"];
   const extras = Object.keys(input).filter((key) => !allowed.includes(key));
   if (extras.length) throw new Error(`Unknown manifest fields: ${extras.join(", ")}.`);
   if (typeof input.version !== "string" || !/^\d+\.\d+\.\d+$/.test(input.version)) throw new Error("manifest.version must use x.y.z format.");
@@ -169,6 +189,7 @@ function normalizeCustomManifest(id: string, label: string, value: unknown): Ada
     return tool as unknown as AdapterManifest["tools"][number];
   });
   if (new Set(tools.map(({ name }) => name)).size !== tools.length) throw new Error("Private tool names must be unique within an adapter.");
+  const authoring = normalizeAuthoringContract(input, tools);
   return {
     id: `private.${id}`,
     version: input.version,
@@ -180,6 +201,7 @@ function normalizeCustomManifest(id: string, label: string, value: unknown): Ada
     pathPatterns,
     intentPatterns: [label.toLocaleLowerCase("en-US")],
     networkAllowlist,
+    ...authoring,
     tools,
   };
 }
@@ -218,6 +240,7 @@ export function getPrivateToolManifest(record: PrivateToolRecord): AdapterManife
 
 export function createPrivateBundlePayload(record: PrivateToolRecord, delivery = "inline") {
   const manifest = getPrivateToolManifest(record);
+  const authoring = authoringMetadata(manifest);
   const base = {
     adapterId: manifest.id,
     version: manifest.version,
@@ -225,6 +248,7 @@ export function createPrivateBundlePayload(record: PrivateToolRecord, delivery =
     expectedOrigins: manifest.origins,
     expectedPaths: manifest.pathPatterns,
     tools: manifest.tools,
+    ...authoring,
     lifecycle: { scope: "current_document", documentNavigation: "reinjection_required", newTab: "separate_injection_required" },
   };
   if (record.kind === "encrypted-custom") {
@@ -276,6 +300,34 @@ export function buildPrivateToolBundle(record: PrivateToolRecord) {
       "/voyager/api/voyagerIdentityDashProfiles",
       "/voyager/api/me",
       "/voyager/api/voyagerMessagingDashMessengerMessages",
+    ],
+    executionPolicy: {
+      tabStrategy: "reuse_resolved_top_level_tab",
+      additionalTabsRequired: false,
+      resourceUrls: "tool_inputs",
+      profileResolution: "same_origin_network_requests",
+      requestConcurrency: "mixed",
+    },
+    agentGuidance: "Reuse one already-open signed-in LinkedIn top-level tab. Configured profile URLs are tool inputs, not pages to open. Do not create a tab per resource; resolve previews in parallel and keep the confirmed send in the same document.",
+    limits: [
+      {
+        id: "reviewed-template-recipient-count",
+        scope: "execution",
+        value: 3,
+        reason: "consent",
+        source: "The reviewed private template currently provides a complete fixed-recipient preview for one to three configured profiles.",
+        configurable: true,
+        description: "This reviewed template accepts one through three fixed recipient profiles per private adapter.",
+      },
+      {
+        id: "one-attempt-per-document",
+        scope: "execution",
+        value: "one batch attempt",
+        reason: "reliability",
+        source: "Ambiguous network writes cannot be safely retried without risking duplicate external side effects.",
+        configurable: false,
+        description: "The adapter permits one batch attempt per document and never automatically retries an ambiguous send.",
+      },
     ],
     tools: [
       {

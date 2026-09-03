@@ -46,6 +46,9 @@ export function createBundleHandler(dependencies: Dependencies) {
       integrity: { algorithm: "sha256", value: integrity },
       expectedOrigins: record.manifest.origins,
       expectedPaths: record.manifest.pathPatterns,
+      executionPolicy: record.manifest.executionPolicy,
+      agentGuidance: record.manifest.agentGuidance,
+      limits: record.manifest.limits,
       activation: {
         method: "cdp-runtime-evaluate",
         cdp: {

@@ -29,6 +29,18 @@ function post(body: Record<string, unknown>) {
   });
 }
 
+const singleTabAuthoring = {
+  executionPolicy: {
+    tabStrategy: "reuse_resolved_top_level_tab",
+    additionalTabsRequired: false,
+    resourceUrls: "not_applicable",
+    profileResolution: "not_applicable",
+    requestConcurrency: "sequential",
+  },
+  agentGuidance: "Reuse the resolved private portal tab and call the known adapter operation without opening additional tabs.",
+  limits: [],
+};
+
 describe("private tool configuration", () => {
   it("normalizes approved LinkedIn profile origins and rejects lookalikes", () => {
     expect(normalizeLinkedInProfileUrl("https://tr.linkedin.com/in/eyupulker?trk=test")).toBe("https://www.linkedin.com/in/eyupulker/");
@@ -65,6 +77,7 @@ describe("private tool configuration", () => {
         origins: ["https://portal.example.com"],
         pathPatterns: ["/*"],
         networkAllowlist: ["/api/items"],
+        ...singleTabAuthoring,
         tools: [{
           name: "adaptab_internal_list_items",
           description: "List a bounded set of items from the private portal.",
@@ -93,6 +106,18 @@ describe("private tool configuration", () => {
       },
       encryptedSource: { algorithm: "AES-GCM", iv: "AAAAAAAAAAAAAAAA", ciphertext: "A".repeat(32) }, sourceHash: "a".repeat(64),
     })).toThrow("require confirmation");
+  });
+
+  it("rejects an unexplained numeric input cap", () => {
+    expect(() => createEncryptedPrivateToolRecord("owner-a", {
+      label: "Capped private reader",
+      manifest: {
+        version: "1.0.0", origins: ["https://portal.example.com"], pathPatterns: ["/*"], networkAllowlist: [],
+        ...singleTabAuthoring,
+        tools: [{ name: "adaptab_capped_reader", description: "Read a caller-selected number of private records.", routeFamily: "portal", readOnly: true, requiresConfirmation: false, inputSchema: { type: "object", properties: { limit: { type: "integer", maximum: 10 } } } }],
+      },
+      encryptedSource: { algorithm: "AES-GCM", iv: "AAAAAAAAAAAAAAAA", ciphertext: "A".repeat(32) }, sourceHash: "a".repeat(64),
+    })).toThrow("needs an explicit manifest.limits declaration");
   });
 });
 
@@ -154,6 +179,7 @@ describe("private tool authorization", () => {
       label: "Internal reader",
       manifest: {
         version: "1.0.0", origins: ["https://portal.example.com"], pathPatterns: ["/*"], networkAllowlist: [],
+        ...singleTabAuthoring,
         tools: [{ name: "adaptab_internal_reader", description: "Read a bounded value from the internal page.", routeFamily: "portal", readOnly: true, requiresConfirmation: false, inputSchema: { type: "object" } }],
       },
       encryptedSource: { algorithm: "AES-GCM", iv: "AAAAAAAAAAAAAAAA", ciphertext: "B".repeat(32) }, sourceHash: "b".repeat(64),

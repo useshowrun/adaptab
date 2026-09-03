@@ -3,16 +3,22 @@ import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { authenticatedFetch, postJson } from "./api";
 import { encryptPrivateSource, hasPrivateToolKey, savePrivateToolKey } from "./private-crypto";
 import { registerPrivateBootstrapTools, registerPrivateWorkspaceTools } from "./register-private-tools";
+import type { AdapterExecutionPolicy, AdapterLimitManifest } from "../../../packages/adapter-sdk/src/types";
+import { normalizeAuthoringContract } from "../../../packages/adapter-sdk/src/authoring";
 
 type ToolSummary = { name: string; description: string; routeFamily: string; readOnly: boolean; requiresConfirmation: boolean; inputSchema: Record<string, unknown> };
 type PrivateTool = {
   id: string; label: string; kind: "template" | "encrypted-custom"; version: string;
   recipientProfileUrls?: string[]; origins: string[]; pathPatterns: string[]; tools: ToolSummary[];
+  executionPolicy: AdapterExecutionPolicy; agentGuidance: string; limits: AdapterLimitManifest[];
   encryption: "generated-template" | "client-aes-gcm"; toolUrl: string; createdAt: string;
 };
 type ImportDocument = {
   label: string;
-  manifest: { version: string; origins: string[]; pathPatterns: string[]; networkAllowlist: string[]; tools: ToolSummary[] };
+  manifest: {
+    version: string; origins: string[]; pathPatterns: string[]; networkAllowlist: string[];
+    executionPolicy: AdapterExecutionPolicy; agentGuidance: string; limits: AdapterLimitManifest[]; tools: ToolSummary[];
+  };
   source: string;
 };
 
@@ -23,6 +29,15 @@ const importExample = JSON.stringify({
     origins: ["https://portal.example.com"],
     pathPatterns: ["/*"],
     networkAllowlist: [],
+    executionPolicy: {
+      tabStrategy: "reuse_resolved_top_level_tab",
+      additionalTabsRequired: false,
+      resourceUrls: "not_applicable",
+      profileResolution: "not_applicable",
+      requestConcurrency: "not_applicable",
+    },
+    agentGuidance: "Reuse the resolved portal tab and call this page-context tool directly. No additional tab or navigation is required.",
+    limits: [],
     tools: [{
       name: "adaptab_internal_page_context",
       description: "Read the title and URL of the current signed-in portal page.",
@@ -45,7 +60,9 @@ return { ok: true, tools: ["adaptab_internal_page_context"] };`,
 function readImportDocument(value: string): ImportDocument | null {
   try {
     const document = JSON.parse(value) as ImportDocument;
-    if (!document || typeof document !== "object" || typeof document.label !== "string" || typeof document.source !== "string" || !document.manifest || !Array.isArray(document.manifest.origins) || !Array.isArray(document.manifest.pathPatterns) || !Array.isArray(document.manifest.networkAllowlist) || !Array.isArray(document.manifest.tools)) return null;
+    const policy = document?.manifest?.executionPolicy;
+    if (!document || typeof document !== "object" || typeof document.label !== "string" || typeof document.source !== "string" || !document.manifest || !Array.isArray(document.manifest.origins) || !Array.isArray(document.manifest.pathPatterns) || !Array.isArray(document.manifest.networkAllowlist) || !policy || typeof policy.tabStrategy !== "string" || typeof policy.additionalTabsRequired !== "boolean" || typeof policy.resourceUrls !== "string" || typeof policy.profileResolution !== "string" || typeof policy.requestConcurrency !== "string" || typeof document.manifest.agentGuidance !== "string" || !Array.isArray(document.manifest.limits) || !Array.isArray(document.manifest.tools)) return null;
+    normalizeAuthoringContract(document.manifest as unknown as Record<string, unknown>, document.manifest.tools);
     return document;
   } catch { return null; }
 }
@@ -134,7 +151,7 @@ export default function Workspace() {
   const actionCount = tools.reduce((count, adapter) => count + adapter.tools.length, 0);
 
   return <main className="workspace">
-    <nav><a className="wordmark" href="/start">AdapTab</a><div className="nav-actions"><a href="/workspace">Workspace</a><button onClick={async () => { await logout(); location.href = "/workspace"; }}>Sign out</button></div></nav>
+      <nav><a className="wordmark" href="/start">AdapTab</a><div className="nav-actions"><a href="https://github.com/useshowrun/adaptab/blob/main/docs/ADAPTER_AUTHORING.md">Authoring guide</a><a href="/workspace">Workspace</a><button onClick={async () => { await logout(); location.href = "/workspace"; }}>Sign out</button></div></nav>
     <header className="workspace-header"><div><p className="eyebrow">PRIVATE WORKSPACE</p><h1>{toolId ? "Private adapter." : "Your private adapters."}</h1></div><p>{user.email || user.name || "Authenticated owner"}</p></header>
     {toolId ? <section className="workspace-card adapter-detail">
       {selected ? <>
@@ -144,6 +161,9 @@ export default function Workspace() {
         <h3>{selected.tools.length} WebMCP {selected.tools.length === 1 ? "action" : "actions"}</h3><ToolRows tools={selected.tools} />
         {selected.recipientProfileUrls && <><h3>Fixed LinkedIn recipients</h3><ul>{selected.recipientProfileUrls.map((url) => <li key={url}><a href={url}>{url}</a></li>)}</ul></>}
         {selected.kind === "encrypted-custom" && <div className="notice"><b>Device key:</b> {hasPrivateToolKey(selected.id) ? "available in this browser" : "missing in this browser"}. AdapTab cannot decrypt this source on the server.</div>}
+        <div className="notice"><b>Agent playbook:</b> {selected.agentGuidance}</div>
+        <div className="notice"><b>Tab policy:</b> {selected.executionPolicy.additionalTabsRequired ? "additional tabs are explicitly required" : "reuse the resolved top-level tab"} · Requests: {selected.executionPolicy.requestConcurrency.replaceAll("_", " ")}</div>
+        {!!selected.limits.length && <><h3>Declared limits</h3><ul>{selected.limits.map((limit) => <li key={limit.id}><b>{limit.description}</b> — {limit.reason.replaceAll("_", " ")}; {limit.configurable ? "caller configurable" : "fixed"}. Source: {limit.source}</li>)}</ul></>}
         <div className="notice"><b>Lifecycle:</b> the trusted browser bridge evaluates the bundle only on an expected top-level origin. Full navigation or a new tab requires reinjection.</div>
       </> : <p>Loading private adapter…</p>}{message && <p className="form-error">{message}</p>}
     </section> : <>
@@ -154,14 +174,14 @@ export default function Workspace() {
           <div className="package-heading"><div><b>{adapter.label}</b><p>{adapter.origins.join(" · ")} · v{adapter.version}</p></div><span>{adapter.encryption === "client-aes-gcm" ? "ENCRYPTED" : "TEMPLATE"}</span></div><ToolRows tools={adapter.tools} />
         </a>) : <p>No private tools yet. Create from a reviewed template or import an encrypted adapter below.</p>}</div>
       </section>
-      <section className="creation-section"><div><p className="eyebrow">ADD TO YOUR LIBRARY</p><h2>Two private paths.</h2></div><div className="workspace-grid">
+      <section className="creation-section"><div><p className="eyebrow">ADD TO YOUR LIBRARY</p><h2>Two private paths.</h2><p>Describe how an agent should reuse tabs and disclose every functional limit. Do not add demo caps or silently remove capabilities. <a href="https://github.com/useshowrun/adaptab/blob/main/docs/ADAPTER_AUTHORING.md">Read the adapter authoring contract.</a></p></div><div className="workspace-grid">
         <form className="workspace-card" onSubmit={createTemplate}><span className="private-badge">REVIEWED TEMPLATE</span><h2>LinkedIn recipient group</h2><p>Configure the tested preview and confirmed-send workflow. Only the recipient URLs are private data.</p>
           <label>Adapter label<input maxLength={80} minLength={3} required value={label} onChange={(event) => setLabel(event.target.value)} /></label>
           <label>LinkedIn profile URLs<textarea required rows={5} placeholder="One /in/ profile URL per line; maximum 3" value={recipients} onChange={(event) => setRecipients(event.target.value)} /></label>
           <button className="primary-button" disabled={busy} type="submit">Create from template</button></form>
         <form className="workspace-card" onSubmit={importCustom}><span className="private-badge">CLIENT ENCRYPTED</span><h2>Import custom adapter</h2><p>Paste a manifest and source. Encryption happens before upload; the key stays in this browser. Imported code is unreviewed and runs with the target page's access.</p>
           <label>Private adapter JSON<textarea required rows={12} placeholder={importExample} value={customJson} onChange={(event) => setCustomJson(event.target.value)} /></label>
-          {importPreview && <div className="permission-preview"><b>Permission preview</b><p><strong>Pages:</strong> {importPreview.manifest.origins.join(", ")} · {importPreview.manifest.pathPatterns.join(", ")}</p><p><strong>Declared network:</strong> {importPreview.manifest.networkAllowlist.length ? importPreview.manifest.networkAllowlist.join(", ") : "none"}</p><ToolRows tools={importPreview.manifest.tools} /><p className="permission-warning">Custom source is owner-supplied and unreviewed. The declared network list is descriptive metadata; the source runs in the page's main world. Import only code you trust.</p></div>}
+          {importPreview && <div className="permission-preview"><b>Permission and execution preview</b><p><strong>Pages:</strong> {importPreview.manifest.origins.join(", ")} · {importPreview.manifest.pathPatterns.join(", ")}</p><p><strong>Declared network:</strong> {importPreview.manifest.networkAllowlist.length ? importPreview.manifest.networkAllowlist.join(", ") : "none"}</p><p><strong>Tabs:</strong> {importPreview.manifest.executionPolicy.additionalTabsRequired ? "additional tabs required" : "reuse the resolved top-level tab"} · <strong>URL handling:</strong> {importPreview.manifest.executionPolicy.resourceUrls.replaceAll("_", " ")} · <strong>Requests:</strong> {importPreview.manifest.executionPolicy.requestConcurrency.replaceAll("_", " ")}</p><p><strong>Agent guidance:</strong> {importPreview.manifest.agentGuidance}</p><p><strong>Declared limits:</strong> {importPreview.manifest.limits.length ? importPreview.manifest.limits.map((limit) => `${limit.id} (${limit.reason}, ${limit.configurable ? "configurable" : "fixed"})`).join(" · ") : "none"}</p><ToolRows tools={importPreview.manifest.tools} /><p className="permission-warning">Custom source is owner-supplied and unreviewed. The declared network list is descriptive metadata; the source runs in the page's main world. Import only code you trust.</p></div>}
           <details><summary>Import format</summary><pre>{importExample}</pre></details>
           <button className="primary-button" disabled={busy || !importPreview} type="submit">Encrypt and import</button></form>
       </div>{message && <p className={message.toLowerCase().includes("fail") || message.toLowerCase().includes("invalid") ? "form-error" : "form-message"}>{message}</p>}</section>

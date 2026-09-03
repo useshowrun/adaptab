@@ -67,10 +67,11 @@ function privateCandidate(record: PrivateToolRecord, intent: string) {
     origins: manifest.origins,
     pathPatterns: manifest.pathPatterns,
     tools: manifest.tools,
+    limits: manifest.limits ?? [],
     integrity,
     intentMatched: score > 0,
     score,
-    agentActivation: activationGuidance(manifest.id, record.kind !== "encrypted-custom"),
+    agentActivation: activationGuidance(manifest, record.kind !== "encrypted-custom"),
   };
 }
 
@@ -127,6 +128,7 @@ export function resolveAvailableAdapters(input: ResolveInput, privateRecords: Pr
       integrity: selected.integrity,
     },
     tools: selected.tools,
+    limits: selected.limits,
     availableAdapters,
     access,
     activation: {

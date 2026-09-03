@@ -18,6 +18,25 @@ export const hackerNewsPublicManifest: AdapterManifest = {
     "news stories",
   ],
   networkAllowlist: [],
+  executionPolicy: {
+    tabStrategy: "reuse_resolved_top_level_tab",
+    additionalTabsRequired: false,
+    resourceUrls: "not_applicable",
+    profileResolution: "not_applicable",
+    requestConcurrency: "not_applicable",
+  },
+  agentGuidance: "Reuse the resolved Hacker News top-level tab. Read the current document through the adapter; it needs no network request, extra tab, or story-page navigation.",
+  limits: [{
+    id: "front-page-output-count",
+    scope: "input",
+    toolName: "adaptab_hacker_news_front_page",
+    inputProperty: "limit",
+    value: 10,
+    reason: "reliability",
+    source: "This reviewed DOM reader is fixture-tested with a ten-story normalized output budget.",
+    configurable: true,
+    description: "The caller may select up to ten stories from the currently open front page.",
+  }],
   tools: [
     {
       name: "adaptab_hacker_news_front_page",

@@ -27,6 +27,25 @@ export const linkedinCoreManifest: AdapterManifest = {
     "search",
   ],
   networkAllowlist: ["/voyager/api/graphql"],
+  executionPolicy: {
+    tabStrategy: "reuse_resolved_top_level_tab",
+    additionalTabsRequired: false,
+    resourceUrls: "not_applicable",
+    profileResolution: "not_applicable",
+    requestConcurrency: "sequential",
+  },
+  agentGuidance: "Reuse the resolved signed-in LinkedIn top-level tab. Search through the adapter's known GraphQL request instead of navigating the interface or opening additional tabs.",
+  limits: [{
+    id: "company-result-count",
+    scope: "input",
+    toolName: "adaptab_linkedin_search_companies",
+    inputProperty: "limit",
+    value: 5,
+    reason: "reliability",
+    source: "This reviewed adapter version is fixture-tested with a five-result normalized response budget.",
+    configurable: true,
+    description: "The caller may select a result count from one through five for this adapter version.",
+  }],
   tools: [
     {
       name: "adaptab_linkedin_search_companies",

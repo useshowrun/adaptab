@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { getBundle, resolveAdapter, sha256 } from "../packages/registry/src/catalog";
 import { resolveAvailableAdapters } from "../packages/registry/src/available";
-import { createPrivateToolRecord } from "../packages/private-tools/src/index";
+import { createEncryptedPrivateToolRecord, createPrivateToolRecord } from "../packages/private-tools/src/index";
+import { assertAdapterAuthoringContract } from "../packages/adapter-sdk/src/authoring";
+import { listPublicAdapters } from "../packages/registry/src/catalog";
 
 describe("adapter resolution", () => {
   it("matches the Raising.fi funding intent", () => {
@@ -67,6 +69,7 @@ describe("adapter resolution", () => {
         additionalTabsRequired: false,
         resourceUrls: "tool_inputs",
         profileResolution: "same_origin_network_requests",
+        requestConcurrency: "sequential",
       });
       expect(result.activation.guidance).toContain("Do not create or navigate to a tab for each recipient");
     }
@@ -88,6 +91,7 @@ describe("adapter resolution", () => {
       expect(result.tools[1]).toMatchObject({ readOnly: false, requiresConfirmation: true });
       expect(result.activation.executionPolicy.additionalTabsRequired).toBe(false);
       expect(result.activation.guidance).toContain("Do not open individual recipient profiles");
+      expect(result.limits).toContainEqual(expect.objectContaining({ id: "reviewed-batch-size", reason: "consent", value: 3 }));
     }
   });
 
@@ -172,9 +176,55 @@ describe("adapter resolution", () => {
     expect(resolveAvailableAdapters(input, [], true).access.privateWorkspace).toBe("connected");
     expect(resolveAvailableAdapters(input, [], false).access.privateWorkspace).toBe("signed_out");
   });
+
+  it("returns a private custom author's execution guidance unchanged", () => {
+    const record = createEncryptedPrivateToolRecord("owner-a", {
+      label: "Internal portal reader",
+      manifest: {
+        version: "1.0.0",
+        origins: ["https://portal.example.com"],
+        pathPatterns: ["/*"],
+        networkAllowlist: ["/api/items"],
+        executionPolicy: {
+          tabStrategy: "reuse_resolved_top_level_tab",
+          additionalTabsRequired: false,
+          resourceUrls: "tool_inputs",
+          profileResolution: "same_origin_network_requests",
+          requestConcurrency: "parallel",
+        },
+        agentGuidance: "Reuse the signed-in portal tab, treat item URLs as inputs, and resolve independent items in parallel without opening their pages.",
+        limits: [],
+        tools: [{
+          name: "adaptab_internal_portal_reader",
+          description: "Read selected items from the signed-in internal portal.",
+          routeFamily: "portal",
+          readOnly: true,
+          requiresConfirmation: false,
+          inputSchema: { type: "object", properties: {}, additionalProperties: false },
+        }],
+      },
+      encryptedSource: { algorithm: "AES-GCM", iv: "AAAAAAAAAAAAAAAA", ciphertext: "A".repeat(32) },
+      sourceHash: "a".repeat(64),
+    });
+    const result = resolveAvailableAdapters({
+      url: "https://portal.example.com/dashboard",
+      intent: "use my Internal portal reader",
+      client: "cdp",
+    }, [record], true);
+    expect(result.matched).toBe(true);
+    if (result.matched) {
+      expect(result.activation.executionPolicy.requestConcurrency).toBe("parallel");
+      expect(result.activation.guidance).toBe(record.manifest!.agentGuidance);
+      expect(result.limits).toEqual([]);
+    }
+  });
 });
 
 describe("immutable bundle", () => {
+  it("enforces the authoring contract for every published adapter", () => {
+    expect(() => listPublicAdapters().forEach(assertAdapterAuthoringContract)).not.toThrow();
+  });
+
   it("returns a stable SHA-256 and strict origin guard", () => {
     const record = getBundle("raising-fi.public.funding", "1.1.0");
     expect(record).toBeDefined();

@@ -41,7 +41,7 @@ Last updated: 2026-09-03
 - Private-workspace code with Netlify Identity, owner-scoped Blobs storage,
   fixed-recipient declarative LinkedIn tools, and authenticated activation
   pages. Identity and the default GitHub provider are enabled in production.
-- Sixty-one automated tests plus production build validation.
+- Sixty-four automated tests plus production build validation.
 
 ## Verified in ChatGPT's integrated browser
 
