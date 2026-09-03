@@ -9,12 +9,15 @@ import { linkedinCoreBundleSource } from "../../../adapters/linkedin/core/bundle
 import { linkedinCoreManifest } from "../../../adapters/linkedin/core/manifest";
 import { linkedinMessagingBundleSource } from "../../../adapters/linkedin/messaging/bundle";
 import { linkedinMessagingManifest } from "../../../adapters/linkedin/messaging/manifest";
+import { linkedinSearchOutreachBundleSource } from "../../../adapters/linkedin/search-outreach/bundle";
+import { linkedinSearchOutreachManifest } from "../../../adapters/linkedin/search-outreach/manifest";
 import type { BundleRecord, ClientKind, ResolveInput } from "../../adapter-sdk/src/types";
 
 const bundles: BundleRecord[] = [
   { manifest: raisingFiManifest, source: raisingFiBundleSource },
   { manifest: githubPublicManifest, source: githubPublicBundleSource },
   { manifest: hackerNewsPublicManifest, source: hackerNewsPublicBundleSource },
+  { manifest: linkedinSearchOutreachManifest, source: linkedinSearchOutreachBundleSource },
   { manifest: linkedinCoreManifest, source: linkedinCoreBundleSource },
   { manifest: linkedinMessagingManifest, source: linkedinMessagingBundleSource },
 ];

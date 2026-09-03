@@ -16,6 +16,10 @@ Last updated: 2026-09-03
   CSRF derivation inside the page, bounded results, and no credential export.
 - `linkedin.messaging.send-message@1.0.0` with exact profile verification,
   short-lived prepare/confirm drafts, and pre-request at-most-once locking.
+- `linkedin.messaging.search-outreach@1.0.0` with visible People-result
+  selection capped at three, exact recipient resolution, complete batch
+  preview, batch-specific confirmation, sequential at-most-once attempts, and
+  stop-on-ambiguity behavior.
 - `github.public.user-research@1.0.0` with public user search, bounded profile
   lookup, and top owner repositories by stars.
 - `hacker-news.public.front-page@1.0.0` with bounded, network-free extraction
@@ -25,7 +29,7 @@ Last updated: 2026-09-03
   and opt-in telemetry.
 - Netlify Blobs append-only storage for sanitized requests and telemetry,
   namespaced by deployment context.
-- Twenty-nine automated tests plus production build validation.
+- Thirty-four automated tests plus production build validation.
 
 ## Verified in ChatGPT's integrated browser
 
@@ -60,6 +64,11 @@ implementation pass.
 The GitHub and Hacker News adapters were each resolved from the public Netlify
 catalog, hash-matched, installed into clean target documents, rediscovered as
 native WebMCP tools, and invoked successfully against live page data.
+
+The current LinkedIn People-search markup was inspected in a live signed-in
+tab and supports the adapter's primary-result boundary. The production WebMCP
+preview still needs deployment verification; no live sends are authorized by
+that test.
 
 This verifies the no-extension MVP path. It still requires a client with an
 approved page-injection capability such as full CDP access.

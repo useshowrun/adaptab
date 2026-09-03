@@ -63,6 +63,23 @@ describe("adapter resolution", () => {
     }
   });
 
+  it("selects guarded search outreach before broader LinkedIn groups", () => {
+    const result = resolveAdapter({
+      url: "https://www.linkedin.com/search/results/people/?keywords=OpenAI",
+      intent: "send messages to search results",
+      client: "chatgpt-integrated-browser",
+    });
+    expect(result.matched).toBe(true);
+    if (result.matched) {
+      expect(result.match.adapterId).toBe("linkedin.messaging.search-outreach");
+      expect(result.tools.map((tool) => tool.name)).toEqual([
+        "adaptab_linkedin_prepare_search_messages",
+        "adaptab_linkedin_send_search_messages",
+      ]);
+      expect(result.tools[1]).toMatchObject({ readOnly: false, requiresConfirmation: true });
+    }
+  });
+
   it("selects the GitHub public user-research group", () => {
     const result = resolveAdapter({
       url: "https://github.com/useshowrun/adaptab",

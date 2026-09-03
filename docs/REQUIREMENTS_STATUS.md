@@ -26,11 +26,11 @@ adds evidence.
 - The end-to-end public MVP is operational: start URL, WebMCP bootstrap,
   route/intent resolution, immutable bundle delivery, trusted CDP injection,
   native target-page tool discovery, and live invocation.
-- Five reviewed adapters are deployed across Raising.fi, GitHub, Hacker News,
-  and two LinkedIn product groups.
-- Twenty-nine automated tests and repeated integrated-browser tests pass.
-- Of the eight original product requirement groups: one is MVP complete, four
-  are partial, and three are designed or deferred.
+- Six reviewed adapters are implemented across Raising.fi, GitHub, Hacker
+  News, and three LinkedIn product groups.
+- Thirty-four automated tests and repeated integrated-browser tests pass.
+- Of the eight original product requirement groups: one is MVP complete, five
+  are partial, and two are designed or deferred.
 - Against the ten MVP success criteria in `PRODUCT_PLAN.md`, eight are complete
   and two are partial: the durable no-match path still needs a production
   persistence test, and the submission demo video is not yet recorded.
@@ -49,7 +49,7 @@ Shipped:
 - Public start page: `https://adaptab.netlify.app/start`.
 - Four native bootstrap tools: resolve, get bundle, request adapter, and report
   result.
-- Five reviewed, versioned adapters in the live catalog.
+- Six reviewed, versioned adapters in the catalog.
 - Public catalog and target adapters verified in ChatGPT's integrated browser.
 
 Remaining product work:
@@ -106,13 +106,17 @@ Shipped:
   expected paths, and reinjection lifecycle.
 - Authenticated requests execute in the target document; target cookies and
   CSRF material do not go to Netlify.
+- The current operational policy is agent-level lazy injection: immediately
+  before use, rediscover the expected tool and rerun resolve/fetch/hash/origin/
+  path/inject only when it is missing or stale.
 
 Missing:
 
 - The user must still approve full CDP and the agent must perform an explicit
   resolve/fetch/verify/inject sequence.
 - Inline bundle delivery consumes model/tool context.
-- Full document navigation and new tabs require explicit reinjection.
+- Full document navigation and new tabs still rely on the agent noticing that
+  the tool is absent and performing lazy reinjection.
 - No standalone supervisor, Chrome new-document hook, or extension runtime.
 - No measured activation latency/token benchmark against Showrun.
 
@@ -122,6 +126,16 @@ Next acceptance milestone:
   outside model context, watches document replacement, and reinjects only the
   resolved adapter. Keep the Netlify page, bridge, and target runtime as
   separate trust boundaries.
+
+Future options:
+
+- A **CDP supervisor engine** can watch approved targets, top-level navigation,
+  and execution-context replacement, then fetch/verify/reinject out of model
+  context while its local session remains connected.
+- A **browser extension** can provide durable per-site activation through a
+  service worker/content runtime and explicit host permissions when a trusted
+  CDP host is unavailable or the user experience warrants installation.
+- Neither option makes the hosted Netlify page a cross-origin injector.
 
 ### R4. Route-, product-, and context-aware tool filtering
 
@@ -188,25 +202,36 @@ Next acceptance milestone:
 **Original intent:** Support sequential or parallel endpoint workflows, first
 within a site and eventually across sites.
 
-**Status: Deferred.**
+**Status: Partial.**
 
-Shipped foundation:
+Shipped:
 
 - LinkedIn messaging uses separate prepare and send steps with a short-lived,
   one-use draft. This proves guarded state transfer but is not a general
   composition engine.
+- `linkedin.messaging.search-outreach@1.0.0` implements the first bounded
+  composition on the current LinkedIn People search page: visible-result
+  selection, parallel exact-recipient resolution, complete preview, a
+  batch-specific confirmation code, and sequential at-most-once sends.
+- The batch is capped at three recipients, expires after five minutes, and
+  stops all remaining attempts after an ambiguous send outcome. Only one
+  batch can be attempted in the same document.
 
 Missing:
 
 - Composition schema, dependency graph, parallel execution, dry-run preview,
-  per-step authorization, caps, idempotency keys, partial-failure semantics,
-  rollback guidance, and cross-site orchestration.
+  per-step authorization, generic idempotency keys, rollback guidance, and
+  cross-site orchestration. The first adapter implements these concerns only
+  for its own bounded workflow.
+- Production WebMCP preview verification for the new adapter. Live sends must
+  be tested only with a freshly authorized exact recipient list and message.
 
 Next acceptance milestone:
 
-- Implement one read-only composition such as funding search → bounded filter
-  → public detail lookup. Keep bulk outreach explicitly out of scope until
-  abuse controls and recipient caps exist.
+- Deploy and invoke the preview tool on a harmless live People search without
+  sending. Then extract the proven state/preview/failure semantics into a
+  generic composition schema. Unbounded or unattended outreach remains out of
+  scope.
 
 ### R7. Private workspaces and team sharing
 
@@ -271,6 +296,7 @@ Next acceptance milestone:
 | `raising-fi.public.funding@1.0.0` | MVP complete | Public resolve, inject, invoke, reload, reinject |
 | `linkedin.core.company-search@1.0.0` | MVP complete | Authenticated company searches; credentials stayed in page |
 | `linkedin.messaging.send-message@1.0.0` | MVP complete | Exact recipient preview and two separately authorized production sends |
+| `linkedin.messaging.search-outreach@1.0.0` | Code complete | Live result-card shape verified; production WebMCP preview pending; no live sends |
 | `github.public.user-research@1.0.0` | MVP complete | Three public tools invoked from production bundle |
 | `hacker-news.public.front-page@1.0.0` | MVP complete | CSP-safe, network-free production invocation |
 

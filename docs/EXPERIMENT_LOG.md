@@ -92,6 +92,21 @@ A later production-catalog test used the reviewed prepare/send adapter with
 fresh user authorization. Exact-recipient preparation succeeded, the one-use
 draft was confirmed once, and LinkedIn again reported a successful send.
 
+## LinkedIn People-search composition probe
+
+An authenticated LinkedIn People search was opened with a harmless keyword to
+validate the first composed adapter's discovery boundary. In the current live
+page, primary search results are exposed as distinct `role=listitem` elements;
+the first `/in/` link in each item identifies the primary result while mutual
+connection links occur later in the same item.
+
+The implemented adapter therefore uses the user's already-open, already-
+filtered result page as its search step, selects at most three visible primary
+links, and resolves each exact profile through the page session before
+creating a preview. Automated tests verify the batch-specific confirmation,
+sequential send order, at-most-once lock, and stop-on-ambiguity behavior. No
+live messages were sent during this probe.
+
 ## GitHub public adapter test
 
 Both the local and deployed AdapTab catalogs resolved
@@ -145,4 +160,4 @@ bounded metadata.
 - Signed bundle verification end to end.
 - Native-site-tool conflict detection.
 - Sales Navigator or Recruiter adapters.
-- Multi-step composed tools.
+- Production WebMCP invocation of the guarded People-search composition.

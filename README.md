@@ -51,7 +51,7 @@ trusted browser bridge performs cross-tab injection.
 
 ## Current demo
 
-The MVP ships five route- and intent-filtered adapters:
+The MVP ships six route- and intent-filtered adapters:
 
 - `raising-fi.public.funding@1.0.0` for the public Raising.fi funding preview.
 - `github.public.user-research@1.0.0` for public user search, profile lookup,
@@ -62,6 +62,9 @@ The MVP ships five route- and intent-filtered adapters:
   search using the current page session.
 - `linkedin.messaging.send-message@1.0.0` for an exact recipient/message
   preview followed by a separately confirmed, at-most-once send attempt.
+- `linkedin.messaging.search-outreach@1.0.0` for a capped People-search
+  recipient preview followed by a batch-specific confirmation and sequential,
+  at-most-once send attempts.
 
 From a clean target tab, the tested flow is:
 
@@ -101,9 +104,12 @@ production build.
 - Telemetry requires an explicit `consent: true` argument and excludes tool
   inputs, outputs, page content, cookies, messages, and account identifiers.
 - A full document navigation removes injected tools. The calling agent must
-  resolve and inject again for the new document.
+  lazily rediscover, resolve, verify, and inject again for the new document.
 - Messaging drafts expire after five minutes, are bound to the current
   document, and become permanently non-retryable before the send request.
+- Search outreach is limited to three visible People results, requires a full
+  preview plus batch-specific confirmation, permits one attempted batch per
+  document, and stops after ambiguity.
 
 AdapTab does not grant permission to automate a website. Adapter authors and
 users must comply with the target service's terms, applicable law, and their

@@ -174,6 +174,42 @@ The integrated browser requires explicit CDP enablement and per-origin
 approval. AdapTab must report these prerequisites honestly rather than
 claiming activation succeeded.
 
+### Current lifecycle policy: agent-level lazy injection
+
+For the current integrated-browser MVP, injection is lazy rather than
+persistent. Immediately before using an AdapTab capability, the agent checks
+the active document's WebMCP tools. If the expected tool is absent or its
+adapter version is stale, the agent resolves the current URL and intent,
+fetches and verifies the immutable bundle, validates the live origin/path, and
+injects it into that document. SPA navigation commonly keeps the registered
+tools; a hard navigation, new tab, or replaced document triggers this check
+again.
+
+This is an agent operating policy, not an always-on injector. The Netlify page
+remains only the catalog/control plane and cannot observe or inject another
+origin by itself.
+
+### Future trusted browser bridges
+
+Two persistence options remain deliberately separate from the hosted catalog:
+
+1. **CDP supervisor engine.** A local process attaches to explicitly approved
+   browser targets, watches target creation, frame/document navigation, and
+   execution-context replacement, resolves the new URL, fetches and verifies
+   the matching bundle outside model context, and reinjects it. It maintains a
+   per-origin approval policy, avoids subframe injection, and stops providing
+   persistence when its CDP session ends.
+2. **Browser extension.** A service worker plus narrowly permissioned content
+   runtime detects matching top-level documents, obtains reviewed and verified
+   bundles, injects in the page's main world, and exposes per-site enable,
+   disable, update, and provenance controls. This improves user experience
+   where no trusted CDP host exists; it also adds extension permissions,
+   publishing, update, and browser-compatibility work.
+
+Neither bridge changes the target-page security rules: origin/path checks,
+allowlisted network access, confirmation for mutations, and target-site
+credentials remaining in the page session still apply.
+
 ## Adapter selection and filtering
 
 Available tools are the intersection of:
@@ -226,6 +262,14 @@ Implement and publish in this order:
    - Narrow input schema and explicit side-effect description.
    - No automatic retry after an ambiguous request.
    - Support one-use/attempt guards for sensitive writes.
+
+4. `linkedin.messaging.search-outreach`
+   - Runs only on a visible LinkedIn People search-results document.
+   - Selects and independently resolves at most three visible primary results.
+   - Produces a full recipient/message preview and batch-specific confirmation
+     code before any send.
+   - Attempts recipients sequentially, never retries, and stops after an
+     ambiguous result; only one batch may be attempted per document.
 
 Sales Navigator and Recruiter are represented in the catalog model but are
 deferred until after the core flow is deployed.
@@ -339,8 +383,24 @@ Unmatched-site requests can prioritize this backlog.
 
 ## Multi-step tools
 
-The schema may reserve a future composed-tool type, but broad write
-orchestration is out of scope for the MVP.
+The first narrow composition is implemented as the guarded LinkedIn People
+search outreach adapter:
+
+```text
+current filtered People search page
+-> select at most three visible primary results
+-> resolve each exact recipient in parallel
+-> return complete recipient + shared-message preview
+-> require a batch-specific confirmation code
+-> send sequentially with at-most-once attempt state
+-> stop remaining sends after an ambiguous result
+-> prohibit a second batch attempt in the same document
+```
+
+This proves composition-specific safety semantics but is not yet a general
+workflow engine. A future composed-tool schema still needs a dependency graph,
+per-step permissions, generic dry-run results, idempotency contracts, and
+partial-failure policy.
 
 A safe first example is:
 
@@ -350,9 +410,10 @@ search Raising.fi funding
 -> fetch public company details
 ```
 
-Bulk outreach such as messaging everyone at a company is explicitly deferred.
-It requires dry-run previews, recipient caps, per-step authorization,
-idempotency, rate limits, partial-failure handling, and anti-abuse policy.
+Unbounded outreach such as messaging everyone at a company remains explicitly
+deferred. The implemented example is capped at three visible recipients and
+cannot skip preview or confirmation. Broader use requires rate limits,
+workspace policy, abuse controls, and stronger idempotency support.
 
 ## Telemetry principles
 
@@ -417,7 +478,7 @@ not individual user activity.
 - automatic community publication
 - Sales Navigator and Recruiter implementations
 - broad multi-site workflows
-- bulk messaging
+- unbounded or unattended bulk messaging
 - site-owner analytics dashboard
 
 ## Success criteria for the first live product
