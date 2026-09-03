@@ -226,6 +226,11 @@ resolved `raising-fi.public.funding@1.1.0`. Its initial HTML and JavaScript
 payload is about 4.5 kB compressed; the authentication module is lazy-loaded
 only when a tool is invoked.
 
+The strict separation was then relaxed intentionally: `/start` again registers
+the identical four tools as a human-facing fallback, while `/bootstrap` stays
+the preferred lightweight activation surface. Registration on either document
+uses the same implementation and does not change the cross-origin trust model.
+
 ## GitHub public adapter test
 
 Both the local and deployed AdapTab catalogs resolved

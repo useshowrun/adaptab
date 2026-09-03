@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { authenticatedFetch } from "./api";
+import { registerBootstrapTools } from "./register-bootstrap";
 import Workspace from "./Workspace";
 
+type BootstrapState = "loading" | "registered" | "already_registered" | "unsupported" | "error";
 type AdapterSummary = {
   id: string;
   version: string;
@@ -17,11 +19,13 @@ export default function App() {
 }
 
 function PublicCatalog() {
+  const [state, setState] = useState<BootstrapState>("loading");
   const [adapters, setAdapters] = useState<AdapterSummary[]>([]);
   const [privateConnection, setPrivateConnection] = useState<PrivateConnection>("loading");
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
+    registerBootstrapTools().then(setState).catch(() => setState("error"));
     fetch(`/api/catalog?fresh=${Date.now()}`, {
       cache: "no-store",
       headers: { accept: "application/json" },
@@ -45,11 +49,21 @@ function PublicCatalog() {
       .catch(() => setPrivateConnection("signed_out"));
   }, []);
 
+  const bootstrapMessage = {
+    loading: "Registering bootstrap tools…",
+    registered: "Bootstrap tools are ready in this tab.",
+    already_registered: "Bootstrap tools are already active in this document.",
+    unsupported: "This browser does not expose WebMCP to the page.",
+    error: "WebMCP was available, but tool registration failed.",
+  }[state];
   const privateMessage = privateConnection === "loading"
-    ? "Checking your private library…"
+    ? " Checking your private library…"
     : privateConnection === "signed_out"
-      ? "Public catalog active; sign in to include private tools."
-      : `${privateConnection.adapters} private ${privateConnection.adapters === 1 ? "adapter" : "adapters"} available to the agent bootstrap.`;
+      ? " Public catalog active; sign in to include private tools."
+      : ` ${privateConnection.adapters} private ${privateConnection.adapters === 1 ? "adapter" : "adapters"} connected.`;
+  const message = state === "registered" || state === "already_registered"
+    ? bootstrapMessage + privateMessage
+    : bootstrapMessage;
 
   return (
     <main>
@@ -69,7 +83,7 @@ function PublicCatalog() {
             <span aria-live="polite">{copied ? "COPIED" : "CLICK TO COPY"}</span>
           </button>
         </div>
-        <div className="status status-registered"><span aria-hidden="true" />{privateMessage}</div>
+        <div className={`status status-${state}`}><span aria-hidden="true" />{message}</div>
       </section>
       <section className="flow" aria-label="How AdapTab works">
         <article><b>01</b><h2>Resolve</h2><p>Match the target origin, route, intent, and browser capability.</p></article>

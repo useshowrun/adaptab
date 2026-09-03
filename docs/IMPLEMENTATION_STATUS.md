@@ -7,7 +7,8 @@ Last updated: 2026-09-03
 - Public production deployment: `https://adaptab.netlify.app/start`.
 - Human-facing Vite + React catalog at `/start` and a separate, agent-only
   `/bootstrap` document with imperative top-level WebMCP registration.
-- The human catalog does not register WebMCP tools.
+- The human catalog registers the same four tools as a convenient fallback;
+  `/bootstrap` remains the lightweight agent-preferred route.
 - The bootstrap registration path is roughly 4.5 kB compressed and lazy-loads
   Netlify Identity only when a tool call needs authenticated API access.
 - Four bootstrap tools: resolve, get bundle, request adapter, and report result.

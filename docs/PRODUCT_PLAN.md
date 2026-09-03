@@ -76,11 +76,12 @@ the MVP and does not by itself solve authenticated cross-origin execution.
 
 The human catalog remains at `/start`; `/bootstrap` is an agent-only top-level
 document with no React interface, catalog request, or workspace-status request
-on its registration path. `/start` does not register WebMCP tools. An agent
-host may keep `/bootstrap` in a background, hidden, or otherwise non-foreground
-browsing context. The document must remain alive because WebMCP registration
-is document-bound. This is different from a page-free remote MCP server, and
-the bootstrap page still cannot inject another origin by itself.
+on its registration path. Both pages register the same four tools so the human
+page is also an activation fallback; `/bootstrap` remains the preferred agent
+route. An agent host may keep it in a background, hidden, or otherwise
+non-foreground browsing context. The document must remain alive because WebMCP
+registration is document-bound. This is different from a page-free remote MCP
+server, and neither page can inject another origin by itself.
 
 The plural prompt is an agent policy, not a bulk-injection primitive. The agent
 enumerates relevant tabs, resolves each URL and task independently, and equips

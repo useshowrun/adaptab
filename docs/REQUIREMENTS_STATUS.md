@@ -49,8 +49,8 @@ Shipped:
 
 - Public start page: `https://adaptab.netlify.app/start`.
 - Lightweight agent page: `https://adaptab.netlify.app/bootstrap`, separate
-  from the human catalog and workspace interface. The human page does not
-  register WebMCP tools.
+  from the human catalog and workspace interface. Both pages register the same
+  four tools, with `/bootstrap` preferred for agent activation.
 - Four native bootstrap tools: resolve, get bundle, request adapter, and report
   result.
 - The same authenticated resolver and bundle tools include the owner's private
