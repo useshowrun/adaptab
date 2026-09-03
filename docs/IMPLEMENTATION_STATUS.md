@@ -44,8 +44,8 @@ Last updated: 2026-09-03
 
 ## Verified in ChatGPT's integrated browser
 
-The local start page exposed all four bootstrap tools as native WebMCP tools.
-The following real flow passed:
+The bootstrap tools were first verified as native WebMCP tools before the
+human/agent page split. The following real flow passed:
 
 1. `adaptab_resolve` matched a clean `https://raising.fi/` tab.
 2. `adaptab_get_bundle` returned the pinned bundle and a hash matching resolve.
@@ -58,6 +58,10 @@ The following real flow passed:
 
 The complete flow was repeated successfully against the public Netlify
 deployment and a clean Raising.fi document.
+
+The later agent-page split was also verified in production: `/start` exposed
+no WebMCP tools, while a hidden `/bootstrap` document exposed all four and
+successfully resolved `raising-fi.public.funding@1.1.0`.
 
 The LinkedIn company-search adapter was resolved from both local and public
 AdapTab catalogs, installed into authenticated LinkedIn documents, and invoked
