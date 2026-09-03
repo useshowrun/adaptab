@@ -242,6 +242,25 @@ agent to reuse one signed-in LinkedIn tab and not open or navigate to a tab for
 each recipient. This guidance changes orchestration only; it adds no recipient
 count restriction.
 
+## Shared adapter-authoring contract test
+
+The deployed public catalog was queried after the shared authoring-contract
+release. All six current public adapters returned a manifest-owned
+`executionPolicy`, textual `agentGuidance`, and a `limits` array. A production
+resolve for LinkedIn People-search messaging returned the selected manifest's
+single-tab policy, mixed parallel/sequential request strategy, direct guidance
+not to open recipient profiles, and both its consent-based batch declaration
+and ambiguity/retry reliability declaration.
+
+Automated tests additionally verify that every published manifest satisfies
+the contract, a private custom author's exact guidance reaches the shared
+resolver, and a numeric private-tool input maximum is rejected when no
+matching evidenced limit declaration exists. The private workspace preview
+uses the same validator before upload. Arbitrary owner-supplied JavaScript can
+still contain behavior not represented in its manifest; private source remains
+unreviewed, while public publication requires source review against the
+manifest and pull-request checklist.
+
 ## GitHub public adapter test
 
 Both the local and deployed AdapTab catalogs resolved
