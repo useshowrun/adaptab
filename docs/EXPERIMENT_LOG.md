@@ -107,6 +107,15 @@ creating a preview. Automated tests verify the batch-specific confirmation,
 sequential send order, at-most-once lock, and stop-on-ambiguity behavior. No
 live messages were sent during this probe.
 
+After deployment, the production catalog resolved
+`linkedin.messaging.search-outreach@1.0.0` for that exact People-search route
+and intent. The fetched bundle's SHA-256 matched the resolver result, CDP
+installed it, and native WebMCP discovered only its preview and confirmed-send
+tools. A preview with limit two independently resolved the first two visible
+primary profiles, returned their names/URLs and an exact shared-message
+preview, plus a batch-specific confirmation code, with `sent: false`. The send
+tool was intentionally not called.
+
 ## GitHub public adapter test
 
 Both the local and deployed AdapTab catalogs resolved
@@ -160,4 +169,5 @@ bounded metadata.
 - Signed bundle verification end to end.
 - Native-site-tool conflict detection.
 - Sales Navigator or Recruiter adapters.
-- Production WebMCP invocation of the guarded People-search composition.
+- Live send of the guarded People-search composition; this requires a fresh,
+  exact recipient/message authorization and is not needed to validate preview.

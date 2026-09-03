@@ -66,9 +66,11 @@ catalog, hash-matched, installed into clean target documents, rediscovered as
 native WebMCP tools, and invoked successfully against live page data.
 
 The current LinkedIn People-search markup was inspected in a live signed-in
-tab and supports the adapter's primary-result boundary. The production WebMCP
-preview still needs deployment verification; no live sends are authorized by
-that test.
+tab and supports the adapter's primary-result boundary. The deployed catalog
+resolved the adapter, its bundle hash matched, CDP installed it, native WebMCP
+discovered its two tools, and a limit-two preview resolved the first two exact
+visible recipients with `sent: false`. No live sends were authorized or made
+by that test.
 
 This verifies the no-extension MVP path. It still requires a client with an
 approved page-injection capability such as full CDP access.

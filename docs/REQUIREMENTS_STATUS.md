@@ -223,15 +223,15 @@ Missing:
   per-step authorization, generic idempotency keys, rollback guidance, and
   cross-site orchestration. The first adapter implements these concerns only
   for its own bounded workflow.
-- Production WebMCP preview verification for the new adapter. Live sends must
-  be tested only with a freshly authorized exact recipient list and message.
+- Generic policy enforcement across compositions, including workspace-level
+  rate limits and abuse controls. Live sends must be tested only with a
+  freshly authorized exact recipient list and message.
 
 Next acceptance milestone:
 
-- Deploy and invoke the preview tool on a harmless live People search without
-  sending. Then extract the proven state/preview/failure semantics into a
-  generic composition schema. Unbounded or unattended outreach remains out of
-  scope.
+- Extract the proven state/preview/failure semantics into a generic
+  composition schema, then add workspace-level policy and rate limits.
+  Unbounded or unattended outreach remains out of scope.
 
 ### R7. Private workspaces and team sharing
 
@@ -296,7 +296,7 @@ Next acceptance milestone:
 | `raising-fi.public.funding@1.0.0` | MVP complete | Public resolve, inject, invoke, reload, reinject |
 | `linkedin.core.company-search@1.0.0` | MVP complete | Authenticated company searches; credentials stayed in page |
 | `linkedin.messaging.send-message@1.0.0` | MVP complete | Exact recipient preview and two separately authorized production sends |
-| `linkedin.messaging.search-outreach@1.0.0` | Code complete | Live result-card shape verified; production WebMCP preview pending; no live sends |
+| `linkedin.messaging.search-outreach@1.0.0` | Code complete | Production resolve/hash/inject/preview verified with two exact recipients; no live sends |
 | `github.public.user-research@1.0.0` | MVP complete | Three public tools invoked from production bundle |
 | `hacker-news.public.front-page@1.0.0` | MVP complete | CSP-safe, network-free production invocation |
 
