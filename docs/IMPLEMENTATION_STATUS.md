@@ -44,8 +44,10 @@ AdapTab catalogs, installed into authenticated LinkedIn documents, and invoked
 through native WebMCP. Queries for OpenAI and Showrun returned bounded company
 results while credentials remained inside the page.
 
-The messaging group was resolved and registered in the authenticated LinkedIn
-document, exposing separate prepare and send tools. Its send, duplicate-send,
+The messaging group was resolved from the public Netlify catalog, its immutable
+bundle hash matched the value returned by resolve, and it was installed into a
+fresh authenticated LinkedIn document. Native WebMCP discovery exposed the
+separate prepare and confirmed-send tools. Its send, duplicate-send,
 ambiguous-outcome, expiry boundary, origin guard, and recipient-validation
 behavior are covered by mocks. No real message was sent during this
 implementation pass.
@@ -55,6 +57,6 @@ approved page-injection capability such as full CDP access.
 
 ## Next
 
-1. Deploy and verify the messaging group from the public catalog without
-   invoking a real send.
-2. Polish public documentation and record the sub-three-minute demo.
+1. Polish public documentation and record the sub-three-minute demo.
+2. Add a guided adapter-authoring workflow using the existing manifests as
+   examples and Showrun only as prior-art reference material.
