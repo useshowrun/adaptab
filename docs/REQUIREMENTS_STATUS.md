@@ -119,6 +119,10 @@ Shipped:
   in the current browser profile; the key never reaches Netlify.
 - Activation describes the exact `Runtime.evaluate` call, expected origins,
   expected paths, and reinjection lifecycle.
+- Resolution returns both structured execution policy and textual guidance.
+  LinkedIn messaging explicitly says to reuse one authenticated tab, treat
+  profile URLs as tool inputs, avoid per-recipient tabs, and use known
+  same-origin requests instead of exploratory navigation.
 - Authenticated requests execute in the target document; target cookies and
   CSRF material do not go to Netlify.
 - The current operational policy is agent-level lazy injection: immediately

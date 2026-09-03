@@ -13,6 +13,7 @@ import { linkedinMessagingManifest } from "../../../adapters/linkedin/messaging/
 import { linkedinSearchOutreachBundleSource } from "../../../adapters/linkedin/search-outreach/bundle";
 import { linkedinSearchOutreachManifest } from "../../../adapters/linkedin/search-outreach/manifest";
 import type { BundleRecord, ClientKind, ResolveInput } from "../../adapter-sdk/src/types";
+import { activationGuidance } from "./activation-guidance";
 
 const bundles: BundleRecord[] = [
   { manifest: raisingFiManifest, source: raisingFiBundleSource },
@@ -124,6 +125,7 @@ export function resolveAdapter(input: ResolveInput) {
       expectedOrigins: manifest.origins,
       expectedPaths: manifest.pathPatterns,
       execution: manifest.execution,
+      ...activationGuidance(manifest.id),
       lifecycle: {
         scope: "current_document" as const,
         spaNavigation: "usually_preserved" as const,

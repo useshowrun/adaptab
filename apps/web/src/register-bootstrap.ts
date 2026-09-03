@@ -15,7 +15,7 @@ export async function registerBootstrapTools(): Promise<"registered" | "already_
     const registrations = [modelContext.registerTool({
       name: "adaptab_resolve",
       description:
-        "Resolve a target page URL and task intent to the smallest compatible AdapTab WebMCP adapter. This checks the public catalog plus the signed-in owner's private library, without accessing the target page.",
+        "Resolve a target page URL and task intent to the smallest compatible AdapTab WebMCP adapter. This checks the public catalog plus the signed-in owner's private library, without accessing the target page. Follow the returned executionPolicy and textual guidance; when additionalTabsRequired is false, reuse the resolved tab and do not open resource URLs as pages.",
       inputSchema: {
         type: "object",
         properties: {

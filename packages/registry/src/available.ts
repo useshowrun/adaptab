@@ -5,6 +5,7 @@ import {
   type PrivateToolRecord,
 } from "../../private-tools/src/index";
 import { listPublicAdapters, resolveAdapter } from "./catalog";
+import { activationGuidance } from "./activation-guidance";
 
 const genericIntentTokens = new Set([
   "adaptab", "current", "delete", "find", "from", "get", "list", "message",
@@ -69,6 +70,7 @@ function privateCandidate(record: PrivateToolRecord, intent: string) {
     integrity,
     intentMatched: score > 0,
     score,
+    agentActivation: activationGuidance(manifest.id, record.kind !== "encrypted-custom"),
   };
 }
 
@@ -97,7 +99,7 @@ export function resolveAvailableAdapters(input: ResolveInput, privateRecords: Pr
   ).sort((left, right) => right.score - left.score || left.tools.length - right.tools.length) : [];
 
   const selectedPrivate = privateCandidates.find(({ intentMatched }) => intentMatched);
-  const availableAdapters = [...privateCandidates.map(({ score: _score, ...candidate }) => candidate), ...publicCandidates];
+  const availableAdapters = [...privateCandidates.map(({ score: _score, agentActivation: _agentActivation, ...candidate }) => candidate), ...publicCandidates];
   const access = { privateWorkspace: privateWorkspaceConnected ? "connected" as const : "signed_out" as const };
 
   if (!selectedPrivate) {
@@ -112,7 +114,7 @@ export function resolveAvailableAdapters(input: ResolveInput, privateRecords: Pr
     return { ...publicResult, availableAdapters, access };
   }
 
-  const { score: _score, intentMatched: _intentMatched, toolUrl, ...selected } = selectedPrivate;
+  const { score: _score, intentMatched: _intentMatched, toolUrl, agentActivation, ...selected } = selectedPrivate;
   return {
     matched: true as const,
     match: {
@@ -134,6 +136,7 @@ export function resolveAvailableAdapters(input: ResolveInput, privateRecords: Pr
       expectedOrigins: selected.origins,
       expectedPaths: selected.pathPatterns,
       execution: "page" as const,
+      ...agentActivation,
       lifecycle: {
         scope: "current_document" as const,
         spaNavigation: "usually_preserved" as const,

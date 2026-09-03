@@ -62,6 +62,13 @@ describe("adapter resolution", () => {
         "adaptab_linkedin_send_prepared_message",
       ]);
       expect(result.tools[1]).toMatchObject({ readOnly: false, requiresConfirmation: true });
+      expect(result.activation.executionPolicy).toEqual({
+        tabStrategy: "reuse_resolved_top_level_tab",
+        additionalTabsRequired: false,
+        resourceUrls: "tool_inputs",
+        profileResolution: "same_origin_network_requests",
+      });
+      expect(result.activation.guidance).toContain("Do not create or navigate to a tab for each recipient");
     }
   });
 
@@ -79,6 +86,8 @@ describe("adapter resolution", () => {
         "adaptab_linkedin_send_search_messages",
       ]);
       expect(result.tools[1]).toMatchObject({ readOnly: false, requiresConfirmation: true });
+      expect(result.activation.executionPolicy.additionalTabsRequired).toBe(false);
+      expect(result.activation.guidance).toContain("Do not open individual recipient profiles");
     }
   });
 
@@ -153,6 +162,8 @@ describe("adapter resolution", () => {
       });
       expect(result.activation.nextTool).toBe("adaptab_get_bundle");
       expect(result.tools).toHaveLength(2);
+      expect(result.activation.executionPolicy.resourceUrls).toBe("tool_inputs");
+      expect(result.activation.guidance).toContain("Do not create a tab per resource");
     }
   });
 

@@ -127,10 +127,23 @@ Suggested output fields:
   "activation": {
     "method": "cdp-runtime-evaluate",
     "targetOrigin": "https://www.linkedin.com",
+    "executionPolicy": {
+      "tabStrategy": "reuse_resolved_top_level_tab",
+      "additionalTabsRequired": false,
+      "resourceUrls": "tool_inputs",
+      "profileResolution": "same_origin_network_requests"
+    },
+    "guidance": "Reuse one signed-in LinkedIn tab. Recipient profile URLs are tool inputs, not pages to open.",
     "persistence": "reinject-after-document-replacement"
   }
 }
 ```
+
+The structured policy is machine-readable, while `guidance` states the same
+playbook in direct language for agents that reason primarily from tool text.
+Adapter-specific guidance should identify the reusable execution tab, say
+whether resource URLs are inputs or navigation targets, and prefer known
+same-origin requests over exploratory browsing.
 
 ### `adaptab_get_bundle`
 
