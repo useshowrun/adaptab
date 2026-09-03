@@ -1,6 +1,6 @@
 # AdapTab product plan
 
-Status: canonical pre-implementation plan  
+Status: implemented MVP architecture and roadmap
 Last updated: 2026-09-03
 
 ## Product identity
@@ -443,4 +443,3 @@ not individual user activity.
 - Netlify Blobs: https://docs.netlify.com/build/data-and-storage/netlify-blobs/
 - Netlify Identity: https://docs.netlify.com/manage/security/secure-access-to-sites/identity/get-started/
 - Showrun reference repository: https://github.com/useshowrun/showrun
-

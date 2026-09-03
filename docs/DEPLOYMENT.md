@@ -7,7 +7,7 @@ and future adapter changes stay synchronized.
 
 1. Create a **public, empty** repository named `adaptab`. Do not initialize it
    with a README, license, or `.gitignore`; those already exist locally.
-2. Copy its HTTPS URL, for example `https://github.com/OWNER/adaptab.git`.
+2. Copy its HTTPS URL, for example `https://github.com/useshowrun/adaptab.git`.
 3. Add that URL as this project's `origin` and push the `main` branch.
 
 ## Netlify
