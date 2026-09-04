@@ -55,10 +55,9 @@ Shipped:
   result.
 - The same authenticated resolver and bundle tools include the owner's private
   library, so private use does not require a second activation page.
-- Seven reviewed, versioned adapters in the catalog source. The six previously
-  deployed adapters are production-verified; the OpenAI Docs supplement is
-  verified against live target pages from the local catalog and still needs
-  production deployment verification.
+- Seven reviewed, versioned adapters in the production catalog, including the
+  OpenAI Docs supplement verified against live target pages from both local and
+  production-delivered bundles.
 
 Remaining product work:
 
@@ -262,7 +261,6 @@ Missing:
 - Stronger isolation for untrusted owner-authored code. Exact page guards are
   enforced, but source runs in the target page main world and its declared
   network allowlist is not a JavaScript sandbox.
-- Production-catalog verification of the OpenAI Docs supplement after deploy.
 - Generic discovery and suppression of exact or semantically equivalent native
   tools before injection; the first supplement uses known namespacing only.
 
@@ -381,7 +379,7 @@ Next acceptance milestone:
 | `linkedin.messaging.search-outreach@1.0.0` | MVP complete | Production resolve/hash/inject/preview and authorized two-recipient send verified |
 | `github.public.user-research@1.0.0` | MVP complete | Three public tools invoked from production bundle |
 | `hacker-news.public.front-page@1.0.0` | MVP complete | CSP-safe, network-free production invocation |
-| `openai.docs.page-extractors@1.0.0` | Browser verified | Live target-page coexistence, native invocation, extraction, nesting, guards, and bounds verified from the local catalog; production deploy pending |
+| `openai.docs.page-extractors@1.0.0` | MVP complete | Production resolve/hash/inject, native coexistence, code extraction, and top-level/nested schema invocation verified |
 
 ## Recommended development order
 

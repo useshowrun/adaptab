@@ -53,7 +53,9 @@ After document navigation to the live Responses create API reference, the
 adapter was reinjected and the schema reader returned bounded HTTP parameters,
 the active `POST` method, deep links, and nested `compact_threshold` metadata.
 This run exposed and fixed an initial nesting-classification defect before
-publication. Production-catalog resolution remains to be verified after deploy.
+publication. After deployment, the production catalog resolved the same
+SHA-256 bundle, and the production-delivered code and schema tools repeated
+both successful live-page invocations.
 
 ## Raising.fi injection test
 
@@ -365,6 +367,4 @@ addressable at its prior SHA-256 for immutable-version compatibility.
 - Production cross-owner isolation with a second Identity account.
 - Signed bundle verification end to end.
 - Generic native-site-tool conflict detection.
-- Production-catalog resolution and invocation of
-  `openai.docs.page-extractors@1.0.0` after deployment.
 - Sales Navigator or Recruiter adapters.

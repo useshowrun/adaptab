@@ -78,8 +78,8 @@ The current catalog source contains seven route- and intent-filtered adapters:
 - `openai.docs.page-extractors@1.0.0` for bounded code-example extraction and
   structured API-parameter reading from the live OpenAI documentation DOM. Its
   namespaced tools supplement the site's native search and navigation tools.
-  Live target-page coexistence is verified; production catalog deployment is
-  pending.
+  Production catalog resolution, live target-page coexistence, and both tool
+  invocations are verified.
 - `linkedin.core.company-search@1.0.0` for authenticated LinkedIn company
   search using the current page session.
 - `linkedin.messaging.send-message@1.0.0` for an exact recipient/message

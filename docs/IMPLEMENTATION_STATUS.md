@@ -89,7 +89,8 @@ production markup plus automated DOM fixtures. A hash-verified local-catalog
 bundle was injected into live OpenAI Learn and API reference documents in the
 integrated browser. Merged native-plus-AdapTab discovery, native tool
 invocation, code extraction, top-level schema extraction, and nested schema
-extraction all succeeded. Production-catalog verification follows deployment.
+extraction all succeeded. The production catalog and SHA-256 bundle were then
+verified with the same successful live invocations after deployment.
 
 The current LinkedIn People-search markup was inspected in a live signed-in
 tab and supports the adapter's primary-result boundary. The deployed catalog
