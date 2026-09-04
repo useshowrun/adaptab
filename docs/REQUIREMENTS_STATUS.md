@@ -3,7 +3,7 @@
 Canonical product plan: [`PRODUCT_PLAN.md`](PRODUCT_PLAN.md)  
 Browser evidence: [`EXPERIMENT_LOG.md`](EXPERIMENT_LOG.md)  
 Showrun migration: [`SHOWRUN_MIGRATION.md`](SHOWRUN_MIGRATION.md)  
-Last reviewed: 2026-09-03
+Last reviewed: 2026-09-04
 
 This document tracks the requirements first stated when AdapTab moved from
 ideation into product building. It is the living gap analysis for future
@@ -26,9 +26,9 @@ adds evidence.
 - The end-to-end public MVP is operational: start URL, WebMCP bootstrap,
   route/intent resolution, immutable bundle delivery, trusted CDP injection,
   native target-page tool discovery, and live invocation.
-- Six reviewed adapters are implemented across Raising.fi, GitHub, Hacker
-  News, and three LinkedIn product groups.
-- Sixty-four automated tests and repeated integrated-browser tests pass.
+- Seven reviewed adapters are implemented across Raising.fi, GitHub, Hacker
+  News, OpenAI Docs, and three LinkedIn product groups.
+- Sixty-nine automated tests and repeated integrated-browser tests pass.
 - Of the eight original product requirement groups: one is MVP complete and
   seven are partial; the private-workspace requirement now has a tested narrow
   implementation rather than only a design.
@@ -55,8 +55,10 @@ Shipped:
   result.
 - The same authenticated resolver and bundle tools include the owner's private
   library, so private use does not require a second activation page.
-- Six reviewed, versioned adapters in the catalog.
-- Public catalog and target adapters verified in ChatGPT's integrated browser.
+- Seven reviewed, versioned adapters in the catalog source. The six previously
+  deployed adapters are production-verified; the OpenAI Docs supplement is
+  verified against live target pages from the local catalog and still needs
+  production deployment verification.
 
 Remaining product work:
 
@@ -185,12 +187,17 @@ Shipped:
 - LinkedIn company search and messaging are separate adapter groups; a send
   intent does not load the search group.
 - Every third-party tool uses the `adaptab_` prefix and discloses provenance.
+- `openai.docs.page-extractors@1.0.0` is the first native-site supplement: it
+  adds two namespaced read-only tools without reusing any current OpenAI Docs
+  native tool name.
 
 Missing:
 
 - Explicit user-permission policy is not yet represented independently from
   browser/CDP approval.
-- Native-site WebMCP conflict detection and preference are not implemented.
+- Generic native-site WebMCP inventory, semantic conflict detection, and
+  preference are not implemented. The OpenAI Docs adapter avoids the currently
+  documented native names explicitly rather than solving this generically.
 - Sales Navigator and Recruiter groups are not implemented.
 - Intent matching is deterministic substring matching rather than a richer
   scored policy with ambiguity handling.
@@ -239,6 +246,10 @@ Shipped:
 - The encrypted custom path is production-verified from the unified `/start`
   page through local decryption, hash match, exact-origin CDP injection, native
   WebMCP discovery, and harmless read-only invocation.
+- A reviewed OpenAI Docs adapter now provides the first public supplementation
+  path: bounded code-example and API-parameter extraction through distinct
+  `adaptab_` names. Integrated-browser verification preserved and invoked a
+  native OpenAI Docs tool alongside both injected tools.
 
 Missing:
 
@@ -251,8 +262,9 @@ Missing:
 - Stronger isolation for untrusted owner-authored code. Exact page guards are
   enforced, but source runs in the target page main world and its declared
   network allowlist is not a JavaScript sandbox.
-- A way to supplement a site that already has native WebMCP without shadowing
-  its tools.
+- Production-catalog verification of the OpenAI Docs supplement after deploy.
+- Generic discovery and suppression of exact or semantically equivalent native
+  tools before injection; the first supplement uses known namespacing only.
 
 Next acceptance milestone:
 
@@ -369,6 +381,7 @@ Next acceptance milestone:
 | `linkedin.messaging.search-outreach@1.0.0` | MVP complete | Production resolve/hash/inject/preview and authorized two-recipient send verified |
 | `github.public.user-research@1.0.0` | MVP complete | Three public tools invoked from production bundle |
 | `hacker-news.public.front-page@1.0.0` | MVP complete | CSP-safe, network-free production invocation |
+| `openai.docs.page-extractors@1.0.0` | Browser verified | Live target-page coexistence, native invocation, extraction, nesting, guards, and bounds verified from the local catalog; production deploy pending |
 
 ## Recommended development order
 

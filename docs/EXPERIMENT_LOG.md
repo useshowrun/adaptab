@@ -1,7 +1,7 @@
 # AdapTab experiment log
 
 Status: observed behavior, not a production guarantee  
-Last updated: 2026-09-03
+Last updated: 2026-09-04
 
 ## Environments tested
 
@@ -19,6 +19,41 @@ native write tool.
 In standalone Chrome 152 with the WebMCP testing feature enabled, the CDP
 WebMCP domain discovered and invoked native documentation tools without an
 extension.
+
+## OpenAI Docs supplemental adapter implementation
+
+The current production OpenAI API reference HTML was inspected before adding
+`openai.docs.page-extractors@1.0.0`. It exposes semantic parameter markup such
+as `.stldocs-property`, `.stldocs-property-declaration`,
+`.stldocs-property-description`, `data-stldocs-language`, and structured
+constraint elements. Code samples use normal `pre code` markup plus
+documentation-specific snippet containers and selected-language metadata.
+
+The reviewed adapter now registers two read-only, network-free tools:
+
+- `adaptab_openai_docs_extract_code_examples` filters bounded live-page code
+  blocks by language and text while returning their section context.
+- `adaptab_openai_docs_read_api_schema` normalizes top-level or nested request
+  parameters, types, required state, descriptions, constraints, language, and
+  deep links. A semantic table fallback covers non-reference layouts.
+
+Automated tests preserve a pre-existing mocked `search_openai_docs` native
+tool while installing both namespaced AdapTab tools, and verify idempotence,
+exact origins, top-level enforcement, filtering, nesting, bounds, and malformed
+input rejection.
+
+The local catalog bundle was then hash-verified and injected with CDP
+`Runtime.evaluate` into the live top-level
+`https://learn.chatgpt.com/docs/webmcp` document. The browser discovered the
+five native OpenAI Docs tools plus both namespaced AdapTab tools. The code
+extractor returned the page's JavaScript `registerTool` example with its exact
+section deep link, and native `lookup_context` still succeeded after injection.
+
+After document navigation to the live Responses create API reference, the
+adapter was reinjected and the schema reader returned bounded HTTP parameters,
+the active `POST` method, deep links, and nested `compact_threshold` metadata.
+This run exposed and fixed an initial nesting-classification defect before
+publication. Production-catalog resolution remains to be verified after deploy.
 
 ## Raising.fi injection test
 
@@ -329,5 +364,7 @@ addressable at its prior SHA-256 for immutable-version compatibility.
 - A production Chrome extension.
 - Production cross-owner isolation with a second Identity account.
 - Signed bundle verification end to end.
-- Native-site-tool conflict detection.
+- Generic native-site-tool conflict detection.
+- Production-catalog resolution and invocation of
+  `openai.docs.page-extractors@1.0.0` after deployment.
 - Sales Navigator or Recruiter adapters.

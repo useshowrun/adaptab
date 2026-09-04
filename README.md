@@ -66,7 +66,7 @@ trusted browser bridge performs cross-tab injection.
 
 ## Current demo
 
-The MVP ships six route- and intent-filtered adapters:
+The current catalog source contains seven route- and intent-filtered adapters:
 
 - `raising-fi.public.funding@1.1.0` for up to 40 recent public Raising.fi
   records with all currently available funding fields, including amounts,
@@ -75,6 +75,11 @@ The MVP ships six route- and intent-filtered adapters:
   and top repositories by stars.
 - `hacker-news.public.front-page@1.0.0` for a bounded, network-free reading of
   the current front page.
+- `openai.docs.page-extractors@1.0.0` for bounded code-example extraction and
+  structured API-parameter reading from the live OpenAI documentation DOM. Its
+  namespaced tools supplement the site's native search and navigation tools.
+  Live target-page coexistence is verified; production catalog deployment is
+  pending.
 - `linkedin.core.company-search@1.0.0` for authenticated LinkedIn company
   search using the current page session.
 - `linkedin.messaging.send-message@1.0.0` for an exact recipient/message

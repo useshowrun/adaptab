@@ -1,6 +1,6 @@
 # AdapTab implementation status
 
-Last updated: 2026-09-03
+Last updated: 2026-09-04
 
 ## Working now
 
@@ -34,6 +34,9 @@ Last updated: 2026-09-03
 - `hacker-news.public.front-page@1.0.0` with bounded, network-free extraction
   of the current front page. The first cross-origin search design was rejected
   during browser verification because Hacker News CSP blocks the request.
+- `openai.docs.page-extractors@1.0.0` with two network-free, read-only tools
+  that extract bounded code examples and structured API parameters from the
+  current OpenAI documentation DOM while preserving known native tool names.
 - Netlify Functions for catalog, resolution, bundle delivery, adapter requests,
   and opt-in telemetry.
 - Netlify Blobs append-only storage for sanitized requests and telemetry,
@@ -41,7 +44,7 @@ Last updated: 2026-09-03
 - Private-workspace code with Netlify Identity, owner-scoped Blobs storage,
   fixed-recipient declarative LinkedIn tools, and authenticated activation
   pages. Identity and the default GitHub provider are enabled in production.
-- Sixty-four automated tests plus production build validation.
+- Sixty-nine automated tests plus production build validation.
 
 ## Verified in ChatGPT's integrated browser
 
@@ -80,6 +83,13 @@ successfully reported by LinkedIn.
 The GitHub and Hacker News adapters were each resolved from the public Netlify
 catalog, hash-matched, installed into clean target documents, rediscovered as
 native WebMCP tools, and invoked successfully against live page data.
+
+The OpenAI Docs supplement is code-complete and validated against current
+production markup plus automated DOM fixtures. A hash-verified local-catalog
+bundle was injected into live OpenAI Learn and API reference documents in the
+integrated browser. Merged native-plus-AdapTab discovery, native tool
+invocation, code extraction, top-level schema extraction, and nested schema
+extraction all succeeded. Production-catalog verification follows deployment.
 
 The current LinkedIn People-search markup was inspected in a live signed-in
 tab and supports the adapter's primary-result boundary. The deployed catalog

@@ -130,6 +130,30 @@ describe("adapter resolution", () => {
     }).matched).toBe(false);
   });
 
+  it("selects the OpenAI Docs supplement without shadowing native tool names", () => {
+    const result = resolveAdapter({
+      url: "https://developers.openai.com/api/reference/resources/responses/methods/create",
+      intent: "extract TypeScript code examples from this page",
+      client: "chatgpt-integrated-browser",
+    });
+    expect(result.matched).toBe(true);
+    if (result.matched) {
+      expect(result.match.adapterId).toBe("openai.docs.page-extractors");
+      expect(result.tools.map((tool) => tool.name)).toEqual([
+        "adaptab_openai_docs_extract_code_examples",
+        "adaptab_openai_docs_read_api_schema",
+      ]);
+      expect(result.tools.every((tool) => tool.readOnly && !tool.requiresConfirmation)).toBe(true);
+      expect(result.activation.expectedOrigins).toContain("https://learn.chatgpt.com");
+      expect(result.activation.guidance).toContain("native search and navigation tools");
+    }
+    expect(resolveAdapter({
+      url: "https://learn.chatgpt.com/docs/webmcp",
+      intent: "read the API parameter schema",
+      client: "cdp",
+    })).toMatchObject({ matched: true, match: { adapterId: "openai.docs.page-extractors" } });
+  });
+
   it("merges route-matched private adapters without overriding an unrelated public intent", () => {
     const privateRecord = createPrivateToolRecord("owner-a", {
       label: "Leadership circle",

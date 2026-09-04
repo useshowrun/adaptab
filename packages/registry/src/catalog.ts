@@ -3,6 +3,8 @@ import { githubPublicBundleSource } from "../../../adapters/github/public/bundle
 import { githubPublicManifest } from "../../../adapters/github/public/manifest";
 import { hackerNewsPublicBundleSource } from "../../../adapters/hacker-news/public/bundle";
 import { hackerNewsPublicManifest } from "../../../adapters/hacker-news/public/manifest";
+import { openAiDocsBundleSource } from "../../../adapters/openai/docs/bundle";
+import { openAiDocsManifest } from "../../../adapters/openai/docs/manifest";
 import { raisingFiBundleSource } from "../../../adapters/raising-fi/bundle";
 import { raisingFiBundleSourceV1, raisingFiManifestV1 } from "../../../adapters/raising-fi/legacy-v1";
 import { raisingFiManifest } from "../../../adapters/raising-fi/manifest";
@@ -20,6 +22,7 @@ const bundles: BundleRecord[] = [
   { manifest: raisingFiManifestV1, source: raisingFiBundleSourceV1 },
   { manifest: githubPublicManifest, source: githubPublicBundleSource },
   { manifest: hackerNewsPublicManifest, source: hackerNewsPublicBundleSource },
+  { manifest: openAiDocsManifest, source: openAiDocsBundleSource },
   { manifest: linkedinSearchOutreachManifest, source: linkedinSearchOutreachBundleSource },
   { manifest: linkedinCoreManifest, source: linkedinCoreBundleSource },
   { manifest: linkedinMessagingManifest, source: linkedinMessagingBundleSource },

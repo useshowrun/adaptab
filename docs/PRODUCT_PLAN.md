@@ -1,7 +1,7 @@
 # AdapTab product plan
 
 Status: implemented MVP architecture and roadmap
-Last updated: 2026-09-03
+Last updated: 2026-09-04
 
 Live requirement-by-requirement progress is tracked in
 [`REQUIREMENTS_STATUS.md`](REQUIREMENTS_STATUS.md).
@@ -12,7 +12,7 @@ Live requirement-by-requirement progress is tracked in
 - Working tagline: **WebMCP for every tab.**
 - Devpost title: **AdapTab: WebMCP for Every Tab**
 - One-line description: AdapTab provides reviewed, route-aware adapters that
-  let an agent add native WebMCP tools to websites that do not provide them.
+  let an agent add or supplement native WebMCP tools on live websites.
 
 ## Background and relationship to Showrun
 
@@ -275,6 +275,12 @@ they are third-party adapters, not tools endorsed by the target site. Native
 site tools should be preferred when an equivalent capability already exists;
 AdapTab should supplement rather than shadow them.
 
+The first supplemental adapter is `openai.docs.page-extractors@1.0.0`. It
+keeps OpenAI Docs' native search, lookup, context, navigation, and guide tools
+intact while adding two distinct read-only DOM extractors for code examples
+and API parameters. The namespaced design avoids known native names, but a
+generic native-tool inventory and semantic conflict policy remain future work.
+
 ## Initial public adapters
 
 Implement and publish in this order:
@@ -306,6 +312,14 @@ Implement and publish in this order:
      code before any send.
    - Attempts recipients sequentially, never retries, and stops after an
      ambiguous result; only one batch may be attempted per document.
+
+5. `openai.docs.page-extractors`
+   - Read-only and network-free.
+   - Runs on exact OpenAI documentation origins in the current top-level tab.
+   - Extracts bounded code examples with language/text filters.
+   - Reads structured API parameters from semantic reference markup with a
+     documentation-table fallback.
+   - Supplements rather than shadows the site's native WebMCP tools.
 
 Sales Navigator and Recruiter are represented in the catalog model but are
 deferred until after the core flow is deployed.
